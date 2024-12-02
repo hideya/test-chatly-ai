@@ -6,6 +6,8 @@ import ChatInput, { ChatInputHandle } from "./ChatInput";
 import { Loader2 } from "lucide-react";
 import type { Message } from "@db/schema";
 import ReactMarkdown from "react-markdown";
+import 'katex/dist/katex.min.css';
+import { InlineMath, BlockMath } from 'react-katex';
 
 interface ChatThreadProps {
   threadId: number | null;
@@ -83,7 +85,56 @@ export default function ChatThread({ threadId, onThreadCreated }: ChatThreadProp
                   <ReactMarkdown 
                     className="prose prose-sm dark:prose-invert prose-p:leading-relaxed prose-pre:p-0"
                     components={{
-                      p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
+                      p: ({ children }) => {
+                        const content = children.toString();
+                        // Match inline LaTeX: $...$
+                        const inlineRegex = /\$(.*?)\$/g;
+                        // Match block LaTeX: $$...$$
+                        const blockRegex = /\$\$(.*?)\$\$/g;
+
+                        let lastIndex = 0;
+                        const elements = [];
+                        let match;
+
+                        // First handle block math
+                        while ((match = blockRegex.exec(content)) !== null) {
+                          // Add text before the match
+                          if (match.index > lastIndex) {
+                            elements.push(content.slice(lastIndex, match.index));
+                          }
+                          // Add the math component
+                          elements.push(
+                            <BlockMath key={match.index} math={match[1].trim()} />
+                          );
+                          lastIndex = match.index + match[0].length;
+                        }
+
+                        // Then handle inline math in the remaining text
+                        const remainingContent = content.slice(lastIndex);
+                        lastIndex = 0;
+                        const inlineElements = [];
+
+                        while ((match = inlineRegex.exec(remainingContent)) !== null) {
+                          // Add text before the match
+                          if (match.index > lastIndex) {
+                            inlineElements.push(remainingContent.slice(lastIndex, match.index));
+                          }
+                          // Add the math component
+                          inlineElements.push(
+                            <InlineMath key={match.index} math={match[1].trim()} />
+                          );
+                          lastIndex = match.index + match[0].length;
+                        }
+
+                        // Add any remaining text
+                        if (lastIndex < remainingContent.length) {
+                          inlineElements.push(remainingContent.slice(lastIndex));
+                        }
+
+                        elements.push(...inlineElements);
+
+                        return <p className="mb-2 last:mb-0">{elements}</p>;
+                      },
                       code: ({ node, inline, className, children, ...props }) => {
                         const match = /language-(\w+)/.exec(className || '');
                         return !inline ? (
