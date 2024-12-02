@@ -10,7 +10,7 @@ import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/componen
 export default function ChatPage() {
   const { user, logout } = useUser();
   const { threads, isLoadingThreads } = useChat();
-  const [selectedThreadId, setSelectedThreadId] = useState<number | null>(null);
+  const [selectedThreadId, setSelectedThreadId] = useState<number | null>(0);
 
   if (isLoadingThreads) {
     return (
