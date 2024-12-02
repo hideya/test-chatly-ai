@@ -66,7 +66,7 @@ export default function ChatThread({ threadId, onThreadCreated }: ChatThreadProp
     let lastIndex = 0;
     
     // Match block math (\[...\])
-    const blockRegex = /\\[(.*?)\\]/g;
+    const blockRegex = /\\\[(.*?)\\\]/g;
     let match: RegExpExecArray | null;
     
     while ((match = blockRegex.exec(content)) !== null) {
@@ -80,7 +80,7 @@ export default function ChatThread({ threadId, onThreadCreated }: ChatThreadProp
     }
     
     // Match inline math (\(...\))
-    const inlineRegex = /\\((.*?)\\)/g;
+    const inlineRegex = /\\\((.*?)\\\)/g;
     content = lastIndex === 0 ? content : content.slice(lastIndex);
     lastIndex = 0;
     
