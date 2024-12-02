@@ -14,11 +14,6 @@ export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(true);
   const { login, register } = useUser();
   const { toast } = useToast();
-  const usernameInputRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    usernameInputRef.current?.focus();
-  }, []);
 
   const form = useForm<InsertUser>({
     resolver: zodResolver(insertUserSchema),
@@ -27,6 +22,10 @@ export default function AuthPage() {
       password: "",
     },
   });
+
+  useEffect(() => {
+    form.setFocus("username");
+  }, [form.setFocus]);
 
   const onSubmit = async (data: InsertUser) => {
     try {
@@ -59,7 +58,6 @@ export default function AuthPage() {
               <Label htmlFor="username">Username</Label>
               <Input
                 id="username"
-                ref={usernameInputRef}
                 {...form.register("username")}
                 className="w-full"
               />
