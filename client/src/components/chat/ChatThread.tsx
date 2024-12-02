@@ -65,8 +65,8 @@ export default function ChatThread({ threadId, onThreadCreated }: ChatThreadProp
     const elements: React.ReactNode[] = [];
     let lastIndex = 0;
     
-    // Match block math (\[...\])
-    const blockRegex = /\\\[(.*?)\\\]/g;
+    // Match block math expressions between lines containing only \[ and \]
+    const blockRegex = /^\\\[\s*\n(.*?)\n\s*\\\]\s*$/gms;
     let match: RegExpExecArray | null;
     
     while ((match = blockRegex.exec(content)) !== null) {
