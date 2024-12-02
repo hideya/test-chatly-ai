@@ -33,7 +33,7 @@ const ChatInput = forwardRef<ChatInputHandle, ChatInputProps>(({ onSubmit }, ref
     }
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
+  const handleKeyUp = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSubmit(e);
@@ -46,7 +46,7 @@ const ChatInput = forwardRef<ChatInputHandle, ChatInputProps>(({ onSubmit }, ref
         ref={inputRef}
         value={message}
         onChange={(e) => setMessage(e.target.value)}
-        onKeyDown={handleKeyDown}
+        onKeyUp={handleKeyUp}
         placeholder="Type a message..."
         className="min-h-[60px] max-h-[200px]"
         disabled={isSubmitting}
