@@ -89,7 +89,11 @@ export default function ChatThread({ threadId, onThreadCreated }: ChatThreadProp
         elements.push(content.slice(lastIndex, match.index));
       }
       elements.push(
-        <InlineMath key={`inline-${match.index}`} math={(match[1] || '').trim()} />
+        <InlineMath 
+          key={`inline-${match.index}`} 
+          math={(match[1] || '').trim()}
+          renderError={(error) => <span className="text-destructive">Error rendering math: {error.message}</span>}
+        />
       );
       lastIndex = match.index + match[0].length;
     }
