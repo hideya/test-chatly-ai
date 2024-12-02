@@ -79,7 +79,7 @@ export default function ChatThread({ threadId, onThreadCreated }: ChatThreadProp
       lastIndex = match.index + match[0].length;
     }
     
-    // Match inline math (\(...\))
+    // Match inline math (\(...\)) with proper whitespace handling
     const inlineRegex = /\\\((.*?)\\\)/g;
     content = lastIndex === 0 ? content : content.slice(lastIndex);
     lastIndex = 0;
@@ -88,11 +88,16 @@ export default function ChatThread({ threadId, onThreadCreated }: ChatThreadProp
       if (match.index > lastIndex) {
         elements.push(content.slice(lastIndex, match.index));
       }
+      const mathContent = (match[1] || '').trim();
       elements.push(
         <InlineMath 
           key={`inline-${match.index}`} 
-          math={(match[1] || '').trim()}
-          renderError={(error) => <span className="text-destructive">Error rendering math: {error.message}</span>}
+          math={mathContent}
+          renderError={(error) => (
+            <span className="text-destructive">
+              Error rendering math: {error.message}
+            </span>
+          )}
         />
       );
       lastIndex = match.index + match[0].length;
