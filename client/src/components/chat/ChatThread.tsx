@@ -41,7 +41,6 @@ export default function ChatThread({ threadId, onThreadCreated }: ChatThreadProp
   }, [messages]);
 
   useEffect(() => {
-    // Focus the input when the component mounts
     chatInputRef.current?.focus();
   }, []);
 
@@ -86,47 +85,58 @@ export default function ChatThread({ threadId, onThreadCreated }: ChatThreadProp
                     className="prose prose-sm dark:prose-invert prose-p:leading-relaxed prose-pre:p-0"
                     components={{
                       p: ({ children }) => {
+                        if (!children) return null;
                         const content = children.toString();
-                        // Match inline LaTeX: $...$
+                        
+                        // Match LaTeX patterns
                         const inlineRegex = /\$(.*?)\$/g;
-                        // Match block LaTeX: $$...$$
                         const blockRegex = /\$\$(.*?)\$\$/g;
+                        const bracketsRegex = /\\\[(.*?)\\\]/g;
 
                         let lastIndex = 0;
                         const elements = [];
                         let match;
 
-                        // First handle block math
-                        while ((match = blockRegex.exec(content)) !== null) {
-                          // Add text before the match
+                        // First handle bracket notation
+                        while ((match = bracketsRegex.exec(content)) !== null) {
                           if (match.index > lastIndex) {
                             elements.push(content.slice(lastIndex, match.index));
                           }
-                          // Add the math component
                           elements.push(
-                            <BlockMath key={match.index} math={match[1].trim()} />
+                            <BlockMath key={`bracket-${match.index}`} math={match[1].trim()} />
                           );
                           lastIndex = match.index + match[0].length;
                         }
 
-                        // Then handle inline math in the remaining text
-                        const remainingContent = content.slice(lastIndex);
+                        // Then handle block math
+                        const remainingAfterBrackets = content.slice(lastIndex);
+                        lastIndex = 0;
+                        
+                        while ((match = blockRegex.exec(remainingAfterBrackets)) !== null) {
+                          if (match.index > lastIndex) {
+                            elements.push(remainingAfterBrackets.slice(lastIndex, match.index));
+                          }
+                          elements.push(
+                            <BlockMath key={`block-${match.index}`} math={match[1].trim()} />
+                          );
+                          lastIndex = match.index + match[0].length;
+                        }
+
+                        // Finally handle inline math
+                        const remainingContent = remainingAfterBrackets.slice(lastIndex);
                         lastIndex = 0;
                         const inlineElements = [];
 
                         while ((match = inlineRegex.exec(remainingContent)) !== null) {
-                          // Add text before the match
                           if (match.index > lastIndex) {
                             inlineElements.push(remainingContent.slice(lastIndex, match.index));
                           }
-                          // Add the math component
                           inlineElements.push(
-                            <InlineMath key={match.index} math={match[1].trim()} />
+                            <InlineMath key={`inline-${match.index}`} math={match[1].trim()} />
                           );
                           lastIndex = match.index + match[0].length;
                         }
 
-                        // Add any remaining text
                         if (lastIndex < remainingContent.length) {
                           inlineElements.push(remainingContent.slice(lastIndex));
                         }
@@ -135,9 +145,10 @@ export default function ChatThread({ threadId, onThreadCreated }: ChatThreadProp
 
                         return <p className="mb-2 last:mb-0">{elements}</p>;
                       },
-                      code: ({ node, inline, className, children, ...props }) => {
+                      code: ({ className, children, ...props }) => {
                         const match = /language-(\w+)/.exec(className || '');
-                        return !inline ? (
+                        const isInline = !match;
+                        return !isInline ? (
                           <pre className="bg-muted-foreground/10 rounded-md p-4 my-2 overflow-x-auto">
                             <code className={match ? `language-${match[1]}` : ''} {...props}>
                               {children}
