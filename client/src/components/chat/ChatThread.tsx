@@ -66,7 +66,7 @@ export default function ChatThread({ threadId, onThreadCreated }: ChatThreadProp
     let lastIndex = 0;
     
     // Match block math expressions between lines containing only \[ and \]
-    const blockRegex = /^\\\[\s*\n(.*?)\n\s*\\\]\s*$/gms;
+    const blockRegex = /^\\\[\s*\n(.*?)\n\s*\\\]\s*$/gm;
     let match: RegExpExecArray | null;
     
     while ((match = blockRegex.exec(content)) !== null) {
