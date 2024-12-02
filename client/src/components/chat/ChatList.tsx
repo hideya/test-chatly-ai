@@ -24,7 +24,7 @@ export default function ChatList({
         <Button
           onClick={() => onSelectThread(0)}
           className="w-full"
-          variant={selectedThreadId === 0 ? "default" : "outline"}
+          variant={selectedThreadId === 0 ? "secondary" : "outline"}
         >
           New Chat
         </Button>
