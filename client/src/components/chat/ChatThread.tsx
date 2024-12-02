@@ -5,6 +5,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import ChatInput, { ChatInputHandle } from "./ChatInput";
 import { Loader2 } from "lucide-react";
 import type { Message } from "@db/schema";
+import ReactMarkdown from "react-markdown";
 
 interface ChatThreadProps {
   threadId: number | null;
@@ -76,7 +77,32 @@ export default function ChatThread({ threadId, onThreadCreated }: ChatThreadProp
                     : "bg-muted"
                 }`}
               >
-                <p className="whitespace-pre-wrap">{message.content}</p>
+                {message.role === "user" ? (
+                  <p className="whitespace-pre-wrap">{message.content}</p>
+                ) : (
+                  <ReactMarkdown 
+                    className="prose prose-sm dark:prose-invert prose-p:leading-relaxed prose-pre:p-0"
+                    components={{
+                      p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
+                      code: ({ node, inline, className, children, ...props }) => {
+                        const match = /language-(\w+)/.exec(className || '');
+                        return !inline ? (
+                          <pre className="bg-muted-foreground/10 rounded-md p-4 my-2 overflow-x-auto">
+                            <code className={match ? `language-${match[1]}` : ''} {...props}>
+                              {children}
+                            </code>
+                          </pre>
+                        ) : (
+                          <code className="bg-muted-foreground/10 rounded-sm px-1" {...props}>
+                            {children}
+                          </code>
+                        );
+                      },
+                    }}
+                  >
+                    {message.content}
+                  </ReactMarkdown>
+                )}
               </div>
             </div>
           ))}
