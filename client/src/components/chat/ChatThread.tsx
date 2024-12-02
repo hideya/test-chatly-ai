@@ -5,6 +5,8 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import ChatInput, { ChatInputHandle } from "./ChatInput";
 import { Loader2 } from "lucide-react";
 import type { Message } from "@db/schema";
+import 'katex/dist/katex.min.css';
+import { InlineMath, BlockMath } from 'react-katex';
 
 interface ChatThreadProps {
   threadId: number | null;
@@ -58,7 +60,43 @@ export default function ChatThread({ threadId, onThreadCreated }: ChatThreadProp
   }
 
   const renderMessageContent = (content: string) => {
-    return <p className="mb-2 last:mb-0 whitespace-pre-wrap">{content}</p>;
+    const elements: React.ReactNode[] = [];
+    let lastIndex = 0;
+    
+    // Match block math (\[...\])
+    const blockRegex = /\\[(.*?)\\]/g;
+    let match: RegExpExecArray | null;
+    
+    while ((match = blockRegex.exec(content)) !== null) {
+      if (match.index > lastIndex) {
+        elements.push(content.slice(lastIndex, match.index));
+      }
+      elements.push(
+        <BlockMath key={match.index} math={match[1].trim()} />
+      );
+      lastIndex = match.index + match[0].length;
+    }
+    
+    // Match inline math (\(...\))
+    const inlineRegex = /\\((.*?)\\)/g;
+    content = lastIndex === 0 ? content : content.slice(lastIndex);
+    lastIndex = 0;
+    
+    while ((match = inlineRegex.exec(content)) !== null) {
+      if (match.index > lastIndex) {
+        elements.push(content.slice(lastIndex, match.index));
+      }
+      elements.push(
+        <InlineMath key={`inline-${match.index}`} math={match[1].trim()} />
+      );
+      lastIndex = match.index + match[0].length;
+    }
+    
+    if (lastIndex < content.length) {
+      elements.push(content.slice(lastIndex));
+    }
+    
+    return <p className="mb-2 last:mb-0 whitespace-pre-wrap">{elements}</p>;
   };
 
   return (
