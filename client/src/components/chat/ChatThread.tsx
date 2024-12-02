@@ -60,6 +60,8 @@ export default function ChatThread({ threadId, onThreadCreated }: ChatThreadProp
   }
 
   const renderMessageContent = (content: string) => {
+    if (!content) return <p className="mb-2 last:mb-0"></p>;
+    
     const elements: React.ReactNode[] = [];
     let lastIndex = 0;
     
@@ -72,7 +74,7 @@ export default function ChatThread({ threadId, onThreadCreated }: ChatThreadProp
         elements.push(content.slice(lastIndex, match.index));
       }
       elements.push(
-        <BlockMath key={match.index} math={match[1].trim()} />
+        <BlockMath key={match.index} math={(match[1] || '').trim()} />
       );
       lastIndex = match.index + match[0].length;
     }
@@ -87,7 +89,7 @@ export default function ChatThread({ threadId, onThreadCreated }: ChatThreadProp
         elements.push(content.slice(lastIndex, match.index));
       }
       elements.push(
-        <InlineMath key={`inline-${match.index}`} math={match[1].trim()} />
+        <InlineMath key={`inline-${match.index}`} math={(match[1] || '').trim()} />
       );
       lastIndex = match.index + match[0].length;
     }
