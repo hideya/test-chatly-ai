@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, forwardRef, useImperativeHandle, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Send } from "lucide-react";
@@ -7,9 +7,18 @@ interface ChatInputProps {
   onSubmit: (message: string) => Promise<void>;
 }
 
-export default function ChatInput({ onSubmit }: ChatInputProps) {
+export interface ChatInputHandle {
+  focus: () => void;
+}
+
+const ChatInput = forwardRef<ChatInputHandle, ChatInputProps>(({ onSubmit }, ref) => {
   const [message, setMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
+
+  useImperativeHandle(ref, () => ({
+    focus: () => inputRef.current?.focus(),
+  }));
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,6 +43,7 @@ export default function ChatInput({ onSubmit }: ChatInputProps) {
   return (
     <form onSubmit={handleSubmit} className="flex gap-2">
       <Textarea
+        ref={inputRef}
         value={message}
         onChange={(e) => setMessage(e.target.value)}
         onKeyDown={handleKeyDown}
@@ -51,4 +61,8 @@ export default function ChatInput({ onSubmit }: ChatInputProps) {
       </Button>
     </form>
   );
-}
+});
+
+ChatInput.displayName = "ChatInput";
+
+export default ChatInput;

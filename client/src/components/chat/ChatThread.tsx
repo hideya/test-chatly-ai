@@ -1,8 +1,8 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useChat } from "../../hooks/use-chat";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import ChatInput from "./ChatInput";
+import ChatInput, { ChatInputHandle } from "./ChatInput";
 import { Loader2 } from "lucide-react";
 import type { Message } from "@db/schema";
 
@@ -13,6 +13,7 @@ interface ChatThreadProps {
 
 export default function ChatThread({ threadId, onThreadCreated }: ChatThreadProps) {
   const { getMessages, createThread, sendMessage } = useChat();
+  const chatInputRef = useRef<ChatInputHandle>(null);
 
   const { data: messages = [], isLoading } = useQuery<Message[]>({
     queryKey: ["messages", threadId],
@@ -35,6 +36,11 @@ export default function ChatThread({ threadId, onThreadCreated }: ChatThreadProp
       scrollArea.scrollTop = scrollArea.scrollHeight;
     }
   }, [messages]);
+
+  useEffect(() => {
+    // Focus the input when the component mounts
+    chatInputRef.current?.focus();
+  }, []);
 
   if (threadId === null) {
     return (
@@ -78,7 +84,7 @@ export default function ChatThread({ threadId, onThreadCreated }: ChatThreadProp
       </ScrollArea>
       <div className="p-4 border-t">
         <div className="max-w-3xl mx-auto">
-          <ChatInput onSubmit={handleSubmit} />
+          <ChatInput ref={chatInputRef} onSubmit={handleSubmit} />
         </div>
       </div>
     </div>
