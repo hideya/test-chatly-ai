@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useUser } from "../hooks/use-user";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,6 +14,11 @@ export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(true);
   const { login, register } = useUser();
   const { toast } = useToast();
+  const usernameInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    usernameInputRef.current?.focus();
+  }, []);
 
   const form = useForm<InsertUser>({
     resolver: zodResolver(insertUserSchema),
@@ -54,6 +59,7 @@ export default function AuthPage() {
               <Label htmlFor="username">Username</Label>
               <Input
                 id="username"
+                ref={usernameInputRef}
                 {...form.register("username")}
                 className="w-full"
               />
