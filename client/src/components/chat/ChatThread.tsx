@@ -17,6 +17,7 @@ export default function ChatThread({ threadId, onThreadCreated }: ChatThreadProp
   const { getMessages, createThread, sendMessage } = useChat();
   const chatInputRef = useRef<ChatInputHandle>(null);
   const [isAIResponding, setIsAIResponding] = useState(false);
+  const [isCreatingThread, setIsCreatingThread] = useState(false);
 
   const { data: messages = [], isLoading: isLoadingMessages } = useQuery<Message[]>({
     queryKey: ["messages", threadId],
@@ -25,15 +26,17 @@ export default function ChatThread({ threadId, onThreadCreated }: ChatThreadProp
   });
 
   const handleSubmit = async (content: string) => {
-    setIsAIResponding(true);
     try {
       if (threadId === 0 || threadId === null) {
+        setIsCreatingThread(true);
         const result = await createThread(content);
         onThreadCreated(result.thread.id);
       } else {
+        setIsAIResponding(true);
         await sendMessage({ threadId, message: content });
       }
     } finally {
+      setIsCreatingThread(false);
       setIsAIResponding(false);
     }
   };
@@ -41,14 +44,18 @@ export default function ChatThread({ threadId, onThreadCreated }: ChatThreadProp
   useEffect(() => {
     const scrollArea = document.querySelector("[data-radix-scroll-area-viewport]");
     if (scrollArea) {
-      scrollArea.scrollTop = scrollArea.scrollHeight;
+      // Add smooth scrolling behavior
+      scrollArea.scrollTo({
+        top: scrollArea.scrollHeight,
+        behavior: 'smooth'
+      });
     }
     
     // Focus input after AI response
     if (messages.length > 0 && messages[messages.length - 1].role === "assistant") {
       setTimeout(() => {
         chatInputRef.current?.focus();
-      }, 0);
+      }, 100); // Slight delay to ensure scroll completes
     }
   }, [messages]);
 
@@ -189,7 +196,7 @@ export default function ChatThread({ threadId, onThreadCreated }: ChatThreadProp
           <ChatInput 
             ref={chatInputRef} 
             onSubmit={handleSubmit} 
-            isLoading={isAIResponding}
+            isLoading={isAIResponding || isCreatingThread}
           />
         </div>
       </div>
