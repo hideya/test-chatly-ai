@@ -23,7 +23,7 @@ export default function ChatList({
       <div className="p-4">
         <Button
           onClick={() => onSelectThread(0)}
-          className="w-full"
+          className="w-full transition-transform active:scale-95"
           variant={selectedThreadId === 0 ? "secondary" : "outline"}
         >
           New Chat

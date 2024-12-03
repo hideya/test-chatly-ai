@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useChat } from "../../hooks/use-chat";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -16,6 +16,7 @@ interface ChatThreadProps {
 export default function ChatThread({ threadId, onThreadCreated }: ChatThreadProps) {
   const { getMessages, createThread, sendMessage } = useChat();
   const chatInputRef = useRef<ChatInputHandle>(null);
+  const [isAIResponding, setIsAIResponding] = useState(false);
 
   const { data: messages = [], isLoading: isLoadingMessages } = useQuery<Message[]>({
     queryKey: ["messages", threadId],
@@ -24,11 +25,16 @@ export default function ChatThread({ threadId, onThreadCreated }: ChatThreadProp
   });
 
   const handleSubmit = async (content: string) => {
-    if (threadId === 0 || threadId === null) {
-      const result = await createThread(content);
-      onThreadCreated(result.thread.id);
-    } else {
-      await sendMessage({ threadId, message: content });
+    setIsAIResponding(true);
+    try {
+      if (threadId === 0 || threadId === null) {
+        const result = await createThread(content);
+        onThreadCreated(result.thread.id);
+      } else {
+        await sendMessage({ threadId, message: content });
+      }
+    } finally {
+      setIsAIResponding(false);
     }
   };
 
@@ -47,7 +53,7 @@ export default function ChatThread({ threadId, onThreadCreated }: ChatThreadProp
   }, [messages]);
 
   useEffect(() => {
-    if (threadId !== null && !isLoading) {
+    if (threadId !== null && !isLoadingMessages) {
       // Small delay to ensure DOM is updated
       setTimeout(() => {
         chatInputRef.current?.focus();
@@ -94,7 +100,7 @@ export default function ChatThread({ threadId, onThreadCreated }: ChatThreadProp
         }
       }
       
-      // Add block math component wrapped in a div instead of being nested in a p tag
+      // Add block math component
       elements.push(
         <div key={`block-${match.index}`} className="mb-2 last:mb-0">
           <BlockMath math={(match[1] || '').trim()} />
@@ -169,11 +175,22 @@ export default function ChatThread({ threadId, onThreadCreated }: ChatThreadProp
               </div>
             </div>
           ))}
+          {isAIResponding && (
+            <div className="flex justify-start">
+              <div className="max-w-[80%] rounded-lg px-4 py-2 bg-muted">
+                <Loader2 className="h-4 w-4 animate-spin" />
+              </div>
+            </div>
+          )}
         </div>
       </ScrollArea>
       <div className="p-4 border-t">
         <div className="max-w-3xl mx-auto">
-          <ChatInput ref={chatInputRef} onSubmit={handleSubmit} />
+          <ChatInput 
+            ref={chatInputRef} 
+            onSubmit={handleSubmit} 
+            isLoading={isAIResponding}
+          />
         </div>
       </div>
     </div>

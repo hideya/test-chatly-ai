@@ -72,7 +72,7 @@ export default function AuthPage() {
               />
             </div>
             <div className="flex flex-col space-y-2">
-              <Button type="submit" className="w-full">
+              <Button type="submit" className="w-full transition-transform active:scale-95">
                 {isLogin ? "Login" : "Register"}
               </Button>
               <Button

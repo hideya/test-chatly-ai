@@ -5,16 +5,16 @@ import { Send, Loader2 } from "lucide-react";
 
 interface ChatInputProps {
   onSubmit: (message: string) => Promise<void>;
+  isLoading?: boolean;
 }
 
 export interface ChatInputHandle {
   focus: () => void;
 }
 
-const ChatInput = forwardRef<ChatInputHandle, ChatInputProps>(({ onSubmit }, ref) => {
+const ChatInput = forwardRef<ChatInputHandle, ChatInputProps>(({ onSubmit, isLoading = false }, ref) => {
   const [message, setMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-const [isLoading, setIsLoading] = useState(false);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
   useImperativeHandle(ref, () => ({
@@ -26,17 +26,15 @@ const [isLoading, setIsLoading] = useState(false);
     if (!message.trim() || isSubmitting) return;
 
     setIsSubmitting(true);
-    setIsLoading(true);
     try {
       await onSubmit(message);
       setMessage("");
     } finally {
       setIsSubmitting(false);
-      setIsLoading(false);
     }
   };
 
-  const handleKeyUp = (e: React.KeyboardEvent) => {
+  const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSubmit(e);
@@ -49,18 +47,18 @@ const [isLoading, setIsLoading] = useState(false);
         ref={inputRef}
         value={message}
         onChange={(e) => setMessage(e.target.value)}
-        onKeyUp={handleKeyUp}
+        onKeyDown={handleKeyDown}
         placeholder="Type a message..."
         className="min-h-[60px] max-h-[200px]"
-        disabled={isSubmitting}
+        disabled={isSubmitting || isLoading}
       />
       <Button
         type="submit"
         size="icon"
-        disabled={!message.trim() || isSubmitting}
-        className="self-end"
+        disabled={!message.trim() || isSubmitting || isLoading}
+        className="self-end transition-transform active:scale-95"
       >
-        {isLoading ? (
+        {isLoading || isSubmitting ? (
           <Loader2 className="h-4 w-4 animate-spin" />
         ) : (
           <Send className="h-4 w-4" />
