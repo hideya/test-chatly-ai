@@ -23,7 +23,7 @@ export default function ChatList({
       <div className="p-4">
         <Button
           onClick={() => onSelectThread(0)}
-          className="w-full transition-all duration-200 active:scale-90 hover:scale-105"
+          className="w-full transition-transform duration-200 active:scale-90 hover:scale-105"
           variant={selectedThreadId === 0 ? "secondary" : "outline"}
         >
           New Chat

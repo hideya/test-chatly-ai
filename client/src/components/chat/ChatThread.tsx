@@ -43,19 +43,24 @@ export default function ChatThread({ threadId, onThreadCreated }: ChatThreadProp
 
   useEffect(() => {
     const scrollArea = document.querySelector("[data-radix-scroll-area-viewport]");
-    const inputArea = document.querySelector(".input-area"); // Add class to input container
+    const inputArea = document.querySelector(".input-area");
     
     if (scrollArea && messages.length > 0) {
-      const scrollHeight = scrollArea.scrollHeight;
+      // Ensure we get the actual viewport height
+      const viewportHeight = scrollArea.clientHeight;
       const inputHeight = inputArea?.clientHeight || 0;
+      const scrollHeight = scrollArea.scrollHeight;
+      
+      // Calculate the optimal scroll position to show the latest message
+      const scrollPosition = Math.max(0, scrollHeight - viewportHeight);
       
       scrollArea.scrollTo({
-        top: scrollHeight - inputHeight,
+        top: scrollPosition,
         behavior: 'smooth'
       });
     }
     
-    // Focus input after AI response
+    // Keep the focus behavior
     if (messages.length > 0 && messages[messages.length - 1].role === "assistant") {
       setTimeout(() => {
         chatInputRef.current?.focus();
