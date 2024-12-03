@@ -40,7 +40,7 @@ export default function ChatThread({ threadId, onThreadCreated }: ChatThreadProp
   }, [messages]);
 
   useEffect(() => {
-    if (threadId === 0 || threadId !== null) {
+    if (threadId !== null) {
       chatInputRef.current?.focus();
     }
   }, [threadId]);
@@ -76,7 +76,9 @@ export default function ChatThread({ threadId, onThreadCreated }: ChatThreadProp
         elements.push(content.slice(lastIndex, match.index));
       }
       elements.push(
-        <BlockMath key={match.index} math={(match[1] || '').trim()} />
+        <span key={match.index} className="block">
+          <BlockMath math={(match[1] || '').trim()} />
+        </span>
       );
       lastIndex = match.index + match[0].length;
     }
