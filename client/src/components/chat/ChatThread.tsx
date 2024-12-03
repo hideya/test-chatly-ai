@@ -43,10 +43,14 @@ export default function ChatThread({ threadId, onThreadCreated }: ChatThreadProp
 
   useEffect(() => {
     const scrollArea = document.querySelector("[data-radix-scroll-area-viewport]");
-    if (scrollArea) {
-      // Add smooth scrolling behavior
+    const inputArea = document.querySelector(".input-area"); // Add class to input container
+    
+    if (scrollArea && messages.length > 0) {
+      const scrollHeight = scrollArea.scrollHeight;
+      const inputHeight = inputArea?.clientHeight || 0;
+      
       scrollArea.scrollTo({
-        top: scrollArea.scrollHeight,
+        top: scrollHeight - inputHeight,
         behavior: 'smooth'
       });
     }
@@ -55,7 +59,7 @@ export default function ChatThread({ threadId, onThreadCreated }: ChatThreadProp
     if (messages.length > 0 && messages[messages.length - 1].role === "assistant") {
       setTimeout(() => {
         chatInputRef.current?.focus();
-      }, 100); // Slight delay to ensure scroll completes
+      }, 100);
     }
   }, [messages]);
 
@@ -191,7 +195,7 @@ export default function ChatThread({ threadId, onThreadCreated }: ChatThreadProp
           )}
         </div>
       </ScrollArea>
-      <div className="p-4 border-t">
+      <div className="p-4 border-t input-area">
         <div className="max-w-3xl mx-auto">
           <ChatInput 
             ref={chatInputRef} 
