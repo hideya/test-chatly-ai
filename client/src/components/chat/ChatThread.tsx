@@ -40,8 +40,10 @@ export default function ChatThread({ threadId, onThreadCreated }: ChatThreadProp
   }, [messages]);
 
   useEffect(() => {
-    chatInputRef.current?.focus();
-  }, []);
+    if (threadId === 0) {
+      chatInputRef.current?.focus();
+    }
+  }, [threadId]);
 
   if (threadId === null) {
     return (
@@ -65,8 +67,8 @@ export default function ChatThread({ threadId, onThreadCreated }: ChatThreadProp
     const elements: React.ReactNode[] = [];
     let lastIndex = 0;
     
-    // Match block math expressions between lines containing only \[ and \], allowing extra whitespace
-    const blockRegex = /^\s*\\\[\s*\n(.*?)\n\s*\\\]\s*$/gm;
+    // Match block math expressions between lines containing only \[ and \], allowing extra whitespace before and after delimiters
+    const blockRegex = /^[ \t]*\\\[\s*\n(.*?)\n[ \t]*\\\]\s*$/gm;
     let match: RegExpExecArray | null;
     
     while ((match = blockRegex.exec(content)) !== null) {
