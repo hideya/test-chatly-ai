@@ -50,13 +50,13 @@ export default function ChatList({
               <Button
                 variant="ghost"
                 size="icon"
-                className="opacity-0 group-hover:opacity-100 transition-opacity"
+                className="opacity-0 group-hover:opacity-100 transition-all active:scale-95"
                 onClick={(e) => {
                   e.stopPropagation();
                   deleteThread(thread.id);
                 }}
               >
-                <Trash2 className="h-4 w-4" />
+                <Trash2 className="h-4 w-4 transition-transform active:scale-90" />
               </Button>
             </div>
           ))}

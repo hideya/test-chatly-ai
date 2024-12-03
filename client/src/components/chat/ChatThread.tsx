@@ -17,7 +17,7 @@ export default function ChatThread({ threadId, onThreadCreated }: ChatThreadProp
   const { getMessages, createThread, sendMessage } = useChat();
   const chatInputRef = useRef<ChatInputHandle>(null);
 
-  const { data: messages = [], isLoading } = useQuery<Message[]>({
+  const { data: messages = [], isLoading: isLoadingMessages } = useQuery<Message[]>({
     queryKey: ["messages", threadId],
     queryFn: () => getMessages(threadId!),
     enabled: threadId !== null && threadId !== 0,
@@ -53,7 +53,7 @@ export default function ChatThread({ threadId, onThreadCreated }: ChatThreadProp
         chatInputRef.current?.focus();
       }, 0);
     }
-  }, [threadId, isLoading]);
+  }, [threadId, isLoadingMessages]);
 
   if (threadId === null) {
     return (
@@ -63,7 +63,7 @@ export default function ChatThread({ threadId, onThreadCreated }: ChatThreadProp
     );
   }
 
-  if (isLoading && threadId !== 0) {
+  if (isLoadingMessages && threadId !== 0) {
     return (
       <div className="h-full flex items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />

@@ -1,7 +1,7 @@
 import { useState, forwardRef, useImperativeHandle, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Send } from "lucide-react";
+import { Send, Loader2 } from "lucide-react";
 
 interface ChatInputProps {
   onSubmit: (message: string) => Promise<void>;
@@ -14,6 +14,7 @@ export interface ChatInputHandle {
 const ChatInput = forwardRef<ChatInputHandle, ChatInputProps>(({ onSubmit }, ref) => {
   const [message, setMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+const [isLoading, setIsLoading] = useState(false);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
   useImperativeHandle(ref, () => ({
@@ -25,11 +26,13 @@ const ChatInput = forwardRef<ChatInputHandle, ChatInputProps>(({ onSubmit }, ref
     if (!message.trim() || isSubmitting) return;
 
     setIsSubmitting(true);
+    setIsLoading(true);
     try {
       await onSubmit(message);
       setMessage("");
     } finally {
       setIsSubmitting(false);
+      setIsLoading(false);
     }
   };
 
@@ -57,7 +60,11 @@ const ChatInput = forwardRef<ChatInputHandle, ChatInputProps>(({ onSubmit }, ref
         disabled={!message.trim() || isSubmitting}
         className="self-end"
       >
-        <Send className="h-4 w-4" />
+        {isLoading ? (
+          <Loader2 className="h-4 w-4 animate-spin" />
+        ) : (
+          <Send className="h-4 w-4" />
+        )}
       </Button>
     </form>
   );
