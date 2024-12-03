@@ -37,6 +37,13 @@ export default function ChatThread({ threadId, onThreadCreated }: ChatThreadProp
     if (scrollArea) {
       scrollArea.scrollTop = scrollArea.scrollHeight;
     }
+    
+    // Focus input after AI response
+    if (messages.length > 0 && messages[messages.length - 1].role === "assistant") {
+      setTimeout(() => {
+        chatInputRef.current?.focus();
+      }, 0);
+    }
   }, [messages]);
 
   useEffect(() => {
@@ -71,7 +78,7 @@ export default function ChatThread({ threadId, onThreadCreated }: ChatThreadProp
     let lastIndex = 0;
     
     // Match block math expressions between lines containing only \[ and \], allowing flexible whitespace
-    const blockRegex = /^\s*\\\[\s*\n([\s\S]*?)\n\s*\\\]\s*$/gm;
+    const blockRegex = /^[ \t]*\\\[[ \t]*\n([\s\S]*?)\n[ \t]*\\\][ \t]*$/gm;
     let match: RegExpExecArray | null;
     
     while ((match = blockRegex.exec(content)) !== null) {
