@@ -40,10 +40,13 @@ export default function ChatThread({ threadId, onThreadCreated }: ChatThreadProp
   }, [messages]);
 
   useEffect(() => {
-    if (threadId !== null) {
-      chatInputRef.current?.focus();
+    if (threadId !== null && !isLoading) {
+      // Small delay to ensure DOM is updated
+      setTimeout(() => {
+        chatInputRef.current?.focus();
+      }, 0);
     }
-  }, [threadId]);
+  }, [threadId, isLoading]);
 
   if (threadId === null) {
     return (
@@ -67,8 +70,8 @@ export default function ChatThread({ threadId, onThreadCreated }: ChatThreadProp
     const elements: React.ReactNode[] = [];
     let lastIndex = 0;
     
-    // Match block math expressions between lines containing only \[ and \], allowing flexible whitespace
-    const blockRegex = /^[\s\t]*\\\[[\s\t]*\n(.*?)\n[\s\t]*\\\][\s\t]*$/gm;
+    // Match block math expressions between lines containing only \[ and \], with flexible whitespace
+    const blockRegex = /^\s*\\\[\s*\n([\s\S]*?)\n\s*\\\]\s*$/gm;
     let match: RegExpExecArray | null;
     
     while ((match = blockRegex.exec(content)) !== null) {
