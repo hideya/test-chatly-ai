@@ -68,50 +68,66 @@ export default function ChatThread({ threadId, onThreadCreated }: ChatThreadProp
     let lastIndex = 0;
     
     // Match block math expressions between lines containing only \[ and \], allowing flexible whitespace
-    const blockRegex = /^[ \t]*\\\[\s*\n(.*?)\n[ \t]*\\\][ \t]*$/gm;
+    const blockRegex = /^[\s\t]*\\\[[\s\t]*\n(.*?)\n[\s\t]*\\\][\s\t]*$/gm;
     let match: RegExpExecArray | null;
     
     while ((match = blockRegex.exec(content)) !== null) {
       if (match.index > lastIndex) {
-        elements.push(content.slice(lastIndex, match.index));
+        elements.push(
+          <p key={`text-${match.index}`} className="mb-2 last:mb-0 whitespace-pre-wrap">
+            {content.slice(lastIndex, match.index)}
+          </p>
+        );
       }
       elements.push(
-        <span key={match.index} className="block">
-          <BlockMath math={(match[1] || '').trim()} />
-        </span>
-      );
-      lastIndex = match.index + match[0].length;
-    }
-    
-    // Match inline math (\(...\)) with proper whitespace handling
-    const inlineRegex = /\\\((.*?)\\\)/g;
-    content = lastIndex === 0 ? content : content.slice(lastIndex);
-    lastIndex = 0;
-    
-    while ((match = inlineRegex.exec(content)) !== null) {
-      if (match.index > lastIndex) {
-        elements.push(content.slice(lastIndex, match.index));
-      }
-      const mathContent = (match[1] || '').trim();
-      elements.push(
-        <InlineMath 
-          key={`inline-${match.index}`} 
-          math={mathContent}
-          renderError={(error) => (
-            <span className="text-destructive">
-              Error rendering math: {error.message}
-            </span>
-          )}
+        <BlockMath 
+          key={`block-${match.index}`} 
+          math={(match[1] || '').trim()}
         />
       );
       lastIndex = match.index + match[0].length;
     }
     
-    if (lastIndex < content.length) {
-      elements.push(content.slice(lastIndex));
+    // Handle remaining text and inline math
+    let remainingContent = lastIndex === 0 ? content : content.slice(lastIndex);
+    if (remainingContent.length > 0) {
+      const inlineElements: React.ReactNode[] = [];
+      lastIndex = 0;
+      const inlineRegex = /\\\((.*?)\\\)/g;
+      
+      while ((match = inlineRegex.exec(remainingContent)) !== null) {
+        if (match.index > lastIndex) {
+          inlineElements.push(remainingContent.slice(lastIndex, match.index));
+        }
+        const mathContent = (match[1] || '').trim();
+        inlineElements.push(
+          <InlineMath 
+            key={`inline-${match.index}`} 
+            math={mathContent}
+            renderError={(error) => (
+              <span className="text-destructive">
+                Error rendering math: {error.message}
+              </span>
+            )}
+          />
+        );
+        lastIndex = match.index + match[0].length;
+      }
+      
+      if (lastIndex < remainingContent.length) {
+        inlineElements.push(remainingContent.slice(lastIndex));
+      }
+      
+      if (inlineElements.length > 0) {
+        elements.push(
+          <p key="remaining" className="mb-2 last:mb-0 whitespace-pre-wrap">
+            {inlineElements}
+          </p>
+        );
+      }
     }
     
-    return <p className="mb-2 last:mb-0 whitespace-pre-wrap">{elements}</p>;
+    return elements;
   };
 
   return (
