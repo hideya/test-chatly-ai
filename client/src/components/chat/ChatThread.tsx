@@ -65,29 +65,35 @@ export default function ChatThread({ threadId, onThreadCreated }: ChatThreadProp
   }
 
   const renderMessageContent = (content: string) => {
-    if (!content) return <p className="mb-2 last:mb-0"></p>;
+    if (!content) return null;
     
     const elements: React.ReactNode[] = [];
     let lastIndex = 0;
     
-    // Match block math expressions between lines containing only \[ and \], with flexible whitespace
+    // Match block math expressions between lines containing only \[ and \], allowing flexible whitespace
     const blockRegex = /^\s*\\\[\s*\n([\s\S]*?)\n\s*\\\]\s*$/gm;
     let match: RegExpExecArray | null;
     
     while ((match = blockRegex.exec(content)) !== null) {
+      // Handle text before the math block
       if (match.index > lastIndex) {
-        elements.push(
-          <p key={`text-${match.index}`} className="mb-2 last:mb-0 whitespace-pre-wrap">
-            {content.slice(lastIndex, match.index)}
-          </p>
-        );
+        const textContent = content.slice(lastIndex, match.index);
+        if (textContent.trim()) {
+          elements.push(
+            <div key={`text-${match.index}`} className="mb-2 last:mb-0 whitespace-pre-wrap">
+              {textContent}
+            </div>
+          );
+        }
       }
+      
+      // Add block math component wrapped in a div instead of being nested in a p tag
       elements.push(
-        <BlockMath 
-          key={`block-${match.index}`} 
-          math={(match[1] || '').trim()}
-        />
+        <div key={`block-${match.index}`} className="mb-2 last:mb-0">
+          <BlockMath math={(match[1] || '').trim()} />
+        </div>
       );
+      
       lastIndex = match.index + match[0].length;
     }
     
@@ -102,6 +108,7 @@ export default function ChatThread({ threadId, onThreadCreated }: ChatThreadProp
         if (match.index > lastIndex) {
           inlineElements.push(remainingContent.slice(lastIndex, match.index));
         }
+        
         const mathContent = (match[1] || '').trim();
         inlineElements.push(
           <InlineMath 
@@ -123,9 +130,9 @@ export default function ChatThread({ threadId, onThreadCreated }: ChatThreadProp
       
       if (inlineElements.length > 0) {
         elements.push(
-          <p key="remaining" className="mb-2 last:mb-0 whitespace-pre-wrap">
+          <div key="remaining" className="mb-2 last:mb-0 whitespace-pre-wrap">
             {inlineElements}
-          </p>
+          </div>
         );
       }
     }
