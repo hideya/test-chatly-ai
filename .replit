@@ -38,6 +38,10 @@ args = "Client Dev Server"
 task = "workflow.run"
 args = "Client App"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Client Dev"
+
 [[workflows.workflow]]
 name = "Full Stack App"
 author = "agent"
@@ -85,6 +89,21 @@ waitForPort = 3000
 
 [[workflows.workflow]]
 name = "Client App"
+author = "agent"
+
+[workflows.workflow.metadata]
+agentRequireRestartOnSave = false
+
+[[workflows.workflow.tasks]]
+task = "packager.installForAll"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd client && npm run dev -- --host 0.0.0.0 --port 3000"
+waitForPort = 3000
+
+[[workflows.workflow]]
+name = "Client Dev"
 author = "agent"
 
 [workflows.workflow.metadata]

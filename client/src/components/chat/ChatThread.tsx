@@ -90,21 +90,26 @@ export default function ChatThread({ threadId, onThreadCreated }: ChatThreadProp
     );
   }
 
-  const renderInlineMath = (content: string): React.ReactNode[] => {
+  const renderInlineMath = (content: string, messageId: number, contentIndex: number): React.ReactNode[] => {
     const inlineElements: React.ReactNode[] = [];
     let lastIndex = 0;
     const inlineRegex = /\\\((.*?)\\\)/g;
     let match: RegExpExecArray | null;
+    let inlineCount = 0;
 
     while ((match = inlineRegex.exec(content)) !== null) {
       if (match.index > lastIndex) {
-        inlineElements.push(content.slice(lastIndex, match.index));
+        inlineElements.push(
+          <span key={`text-${messageId}-${contentIndex}-${inlineCount}`}>
+            {content.slice(lastIndex, match.index)}
+          </span>
+        );
       }
       
       const mathContent = (match[1] || '').trim();
       inlineElements.push(
         <InlineMath 
-          key={`inline-${match.index}`} 
+          key={`inline-math-${messageId}-${contentIndex}-${inlineCount}`}
           math={mathContent}
           renderError={(error) => (
             <span className="text-destructive">
@@ -114,20 +119,26 @@ export default function ChatThread({ threadId, onThreadCreated }: ChatThreadProp
         />
       );
       lastIndex = match.index + match[0].length;
+      inlineCount++;
     }
     
     if (lastIndex < content.length) {
-      inlineElements.push(content.slice(lastIndex));
+      inlineElements.push(
+        <span key={`text-${messageId}-${contentIndex}-${inlineCount}`}>
+          {content.slice(lastIndex)}
+        </span>
+      );
     }
     
     return inlineElements;
   };
 
-  const renderMessageContent = (content: string) => {
+  const renderMessageContent = (content: string, messageId: number) => {
     if (!content) return null;
     
     const elements: React.ReactNode[] = [];
     let lastIndex = 0;
+    let elementIndex = 0;
     
     // Match block math expressions between lines containing only \[ and \], allowing flexible whitespace
     const blockRegex = /^\s*\\\[\s*\n(.*)\n\s*\\\]\s*$/gm;
@@ -138,40 +149,39 @@ export default function ChatThread({ threadId, onThreadCreated }: ChatThreadProp
       if (match.index > lastIndex) {
         const textContent = content.slice(lastIndex, match.index);
         if (textContent.trim()) {
-          const inlineElements = renderInlineMath(textContent);
-          
-          if (inlineElements.length > 0) {
-            elements.push(
-              <div key="remaining" className="mb-2 last:mb-0 whitespace-pre-wrap">
-                {inlineElements}
-              </div>
-            );
-          }
+          const inlineElements = renderInlineMath(textContent, messageId, elementIndex);
+          elements.push(
+            <div key={`content-${messageId}-${elementIndex}`} className="mb-2 last:mb-0 whitespace-pre-wrap">
+              {inlineElements}
+            </div>
+          );
         }
+        elementIndex++;
       }
       
       // Add block math component
       elements.push(
-        <div key={`block-${match.index}`} className="mb-2 last:mb-0">
+        <div key={`block-math-${messageId}-${elementIndex}`} className="mb-2 last:mb-0">
           <BlockMath math={(match[1] || '').trim()} />
         </div>
       );
       
       lastIndex = match.index + match[0].length;
+      elementIndex++;
     }
     
     // Handle remaining text and inline math
-    let remainingContent = lastIndex === 0 ? content : content.slice(lastIndex);
-    if (remainingContent.length > 0) {
-      const inlineElements = renderInlineMath(remainingContent);
-      
-      if (inlineElements.length > 0) {
-        elements.push(
-          <div key="remaining" className="mb-2 last:mb-0 whitespace-pre-wrap">
-            {inlineElements}
-          </div>
-        );
-      }
+    const remainingContent = content.slice(lastIndex);
+    if (remainingContent.trim().length > 0) {
+      const inlineElements = renderInlineMath(remainingContent, messageId, elementIndex);
+      elements.push(
+        <div 
+          key={`remaining-content-${messageId}-${elementIndex}-${remainingContent.substring(0, 10)}`} 
+          className="mb-2 last:mb-0 whitespace-pre-wrap"
+        >
+          {inlineElements}
+        </div>
+      );
     }
     
     return elements;
@@ -181,9 +191,9 @@ export default function ChatThread({ threadId, onThreadCreated }: ChatThreadProp
     <div className="h-full flex flex-col">
       <ScrollArea className="flex-1 p-4">
         <div className="max-w-3xl mx-auto space-y-4">
-          {messages.map((message, i) => (
+          {messages.map((message) => (
             <div
-              key={i}
+              key={`message-${message.id}`}
               className={`flex ${
                 message.role === "user" ? "justify-end" : "justify-start"
               }`}
@@ -195,7 +205,7 @@ export default function ChatThread({ threadId, onThreadCreated }: ChatThreadProp
                     : "bg-muted"
                 }`}
               >
-                {renderMessageContent(message.content)}
+                {renderMessageContent(message.content, message.id)}
               </div>
             </div>
           ))}
