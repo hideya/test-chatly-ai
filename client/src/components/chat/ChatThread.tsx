@@ -148,7 +148,7 @@ export default function ChatThread({ threadId, onThreadCreated }: ChatThreadProp
       // Handle text before the math block
       if (match.index > lastIndex) {
         const textContent = content.slice(lastIndex, match.index);
-        if (textContent.trim()) {
+        if (textContent.length) {
           const inlineElements = renderInlineMath(textContent, messageId, elementIndex);
           elements.push(
             <div 
@@ -179,7 +179,7 @@ export default function ChatThread({ threadId, onThreadCreated }: ChatThreadProp
     
     // Handle remaining text and inline math
     const remainingContent = content.slice(lastIndex);
-    if (remainingContent.trim().length > 0) {
+    if (remainingContent.length) {
       const inlineElements = renderInlineMath(remainingContent, messageId, elementIndex);
       elements.push(
         <div 
