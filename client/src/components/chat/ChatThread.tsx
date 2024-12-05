@@ -7,6 +7,7 @@ import { Loader2 } from "lucide-react";
 import type { Message } from "@db/schema";
 import 'katex/dist/katex.min.css';
 import { InlineMath, BlockMath } from 'react-katex';
+import ReactMarkdown from 'react-markdown';
 
 interface ChatThreadProps {
   threadId: number | null;
@@ -135,63 +136,59 @@ export default function ChatThread({ threadId, onThreadCreated }: ChatThreadProp
 
   const renderMessageContent = (content: string, messageId: number) => {
     if (!content) return null;
-    
-    const elements: React.ReactNode[] = [];
-    let lastIndex = 0;
-    let elementIndex = 0;
-    
-    // Match block math expressions between lines containing only \[ and \], allowing flexible whitespace
-    const blockRegex = /^\s*\\\[\s*\n(.*)\n\s*\\\]\s*$/gm;
-    let match: RegExpExecArray | null;
-    
-    while ((match = blockRegex.exec(content)) !== null) {
-      // Handle text before the math block
-      if (match.index > lastIndex) {
-        const textContent = content.slice(lastIndex, match.index);
-        if (textContent.length) {
-          const inlineElements = renderInlineMath(textContent, messageId, elementIndex);
-          elements.push(
-            <div 
-              key={`text-content-${messageId}-${elementIndex}-${textContent.substring(0, 10)}`} 
-              className="whitespace-pre-wrap"
-            >
-              {inlineElements}
+
+    // Function to handle LaTeX expressions
+    const renderers = {
+      // For inline code, check if it's LaTeX and render accordingly
+      code: ({ children }: { children: string }) => {
+        if (children.startsWith('math:')) {
+          const mathContent = children.slice(5).trim();
+          return <InlineMath math={mathContent} />;
+        }
+        return <code>{children}</code>;
+      },
+      // For code blocks, check if it's LaTeX and render accordingly
+      pre: ({ children }: { children: React.ReactNode }) => {
+        const childrenArray = React.Children.toArray(children);
+        const codeChild = childrenArray[0] as React.ReactElement;
+        
+        if (codeChild?.props?.className === 'language-math') {
+          return (
+            <div className="mt-6 mb-6">
+              <BlockMath math={codeChild.props.children} />
             </div>
           );
         }
-        elementIndex++;
-      }
-      
-      // Add block math component
-      const mathContent = (match[1] || '').trim();
-      elements.push(
-        <div 
-          key={`block-math-${messageId}-${elementIndex}-${mathContent.substring(0, 10)}`} 
-          className="mt-6 mb-6"
+        return <pre>{children}</pre>;
+      },
+      // Custom paragraph handling to preserve whitespace
+      p: ({ children }: { children: React.ReactNode }) => (
+        <p className="whitespace-pre-wrap">{children}</p>
+      )
+    };
+
+    // Process block math expressions first
+    const processedContent = content.replace(
+      /^\s*\\\[\s*\n(.*?)\n\s*\\\]\s*$/gms,
+      (_, math) => `\`\`\`math\n${math.trim()}\n\`\`\``
+    );
+
+    // Process inline math expressions
+    const finalContent = processedContent.replace(
+      /\\\((.*?)\\\)/g,
+      (_, math) => `\`math:${math.trim()}\``
+    );
+
+    return (
+      <div key={`message-content-${messageId}`}>
+        <ReactMarkdown
+          components={renderers}
+          className="markdown-content prose dark:prose-invert max-w-none"
         >
-          <BlockMath math={mathContent} />
-        </div>
-      );
-      
-      lastIndex = match.index + match[0].length + 1 /* eliminate newline */;
-      elementIndex++;
-    }
-    
-    // Handle remaining text and inline math
-    const remainingContent = content.slice(lastIndex);
-    if (remainingContent.length) {
-      const inlineElements = renderInlineMath(remainingContent, messageId, elementIndex);
-      elements.push(
-        <div 
-          key={`remaining-content-${messageId}-${elementIndex}-${remainingContent.substring(0, 10)}`} 
-          className="whitespace-pre-wrap"
-        >
-          {inlineElements}
-        </div>
-      );
-    }
-    
-    return elements;
+          {finalContent}
+        </ReactMarkdown>
+      </div>
+    );
   };
 
   return (
