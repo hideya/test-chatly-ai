@@ -31,19 +31,19 @@ A full-featured ChatGPT-like application providing conversational AI capabilitie
 ## Technologies Used
 
 - **Frontend**
-  - React with TypeScript
-  - Tailwind CSS for styling
-  - Shadcn UI components
-  - React Query for state management
-  - KaTeX for LaTeX rendering
-  - Lucide React for icons
-  - Wouter for routing
+  - [React](https://react.dev/) with [TypeScript](https://www.typescriptlang.org/)
+  - [Tailwind CSS](https://tailwindcss.com/) for styling
+  - [Shadcn UI](https://ui.shadcn.com/) components
+  - [TanStack Query](https://tanstack.com/query/latest) for state management
+  - [KaTeX](https://katex.org/) for LaTeX rendering
+  - [Lucide React](https://lucide.dev/guide/packages/lucide-react) for icons
+  - [Wouter](https://github.com/molefrog/wouter) for routing
 
 - **Backend**
-  - Node.js with Express
-  - PostgreSQL database
-  - Drizzle ORM
-  - OpenAI API integration
+  - [Node.js](https://nodejs.org/) with [Express](https://expressjs.com/)
+  - [PostgreSQL](https://www.postgresql.org/) database
+  - [Drizzle ORM](https://orm.drizzle.team/) for database management
+  - [OpenAI API](https://platform.openai.com/docs/introduction) integration
 
 ## Prerequisites
 
