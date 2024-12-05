@@ -12,23 +12,27 @@ Before running the application, ensure you have:
 
 ## Environment Setup
 
-1. Copy the template environment file:
-   ```bash
-   cp .env.template .env
+1. Create your environment configuration:
+   - Copy the template environment file:
+     ```bash
+     cp .env.template .env
+     ```
+   - The `.env` file is automatically ignored by Git to prevent accidental commits
+   - Update the `.env` file with your credentials:
+     - Set your PostgreSQL database URL
+     - Add your OpenAI API key
+
+2. Required environment variables:
+   ```env
+   DATABASE_URL=postgresql://user:password@host:5432/database  # Your PostgreSQL connection URL (default port: 5432)
+   OPENAI_API_KEY=sk-...         # Your OpenAI API key
+   PORT=5000                     # Server port (optional, defaults to 5000)
    ```
 
-2. Update the `.env` file with your credentials:
-   - Set your PostgreSQL database URL
-   - Add your OpenAI API key
-   
-The following environment variables are required:
-
-```env
-DATABASE_URL=postgresql://user:password@host:5432/database  # Your PostgreSQL connection URL (default port: 5432)
-OPENAI_API_KEY=sk-...         # Your OpenAI API key
-```
-
-Note: Never commit your `.env` file to version control.
+Important:
+- Never commit the `.env` file to version control
+- Always use `.env.template` as a reference for required variables
+- Keep your API keys and sensitive credentials secure
 
 ## Installation
 
