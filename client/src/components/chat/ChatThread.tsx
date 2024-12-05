@@ -138,11 +138,15 @@ export default function ChatThread({ threadId, onThreadCreated }: ChatThreadProp
       if (match.index > lastIndex) {
         const textContent = content.slice(lastIndex, match.index);
         if (textContent.trim()) {
-          elements.push(
-            <div key={`text-${match.index}`} className="mb-2 last:mb-0 whitespace-pre-wrap">
-              {textContent}
-            </div>
-          );
+          const inlineElements = renderInlineMath(textContent);
+          
+          if (inlineElements.length > 0) {
+            elements.push(
+              <div key="remaining" className="mb-2 last:mb-0 whitespace-pre-wrap">
+                {inlineElements}
+              </div>
+            );
+          }
         }
       }
       
