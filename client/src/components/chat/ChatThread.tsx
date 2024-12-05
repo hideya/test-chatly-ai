@@ -151,7 +151,10 @@ export default function ChatThread({ threadId, onThreadCreated }: ChatThreadProp
         if (textContent.trim()) {
           const inlineElements = renderInlineMath(textContent, messageId, elementIndex);
           elements.push(
-            <div key={`content-${messageId}-${elementIndex}`} className="mb-2 last:mb-0 whitespace-pre-wrap">
+            <div 
+              key={`text-content-${messageId}-${elementIndex}-${textContent.substring(0, 10)}`} 
+              className="mb-2 last:mb-0 whitespace-pre-wrap"
+            >
               {inlineElements}
             </div>
           );
@@ -160,9 +163,13 @@ export default function ChatThread({ threadId, onThreadCreated }: ChatThreadProp
       }
       
       // Add block math component
+      const mathContent = (match[1] || '').trim();
       elements.push(
-        <div key={`block-math-${messageId}-${elementIndex}`} className="mb-2 last:mb-0">
-          <BlockMath math={(match[1] || '').trim()} />
+        <div 
+          key={`block-math-${messageId}-${elementIndex}-${mathContent.substring(0, 10)}`} 
+          className="mb-2 last:mb-0"
+        >
+          <BlockMath math={mathContent} />
         </div>
       );
       
