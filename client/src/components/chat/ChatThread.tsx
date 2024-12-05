@@ -97,7 +97,7 @@ export default function ChatThread({ threadId, onThreadCreated }: ChatThreadProp
     let lastIndex = 0;
     
     // Match block math expressions between lines containing only \[ and \], allowing flexible whitespace
-    const blockRegex = /^[ \t]*\\\[[ \t]*\n([\s\S]*?)\n[ \t]*\\\][ \t]*$/gm;
+    const blockRegex = /^\s*\\\[\s*\n(.*)\n\s*\\\]\s*$/gm;
     let match: RegExpExecArray | null;
     
     while ((match = blockRegex.exec(content)) !== null) {
