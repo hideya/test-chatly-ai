@@ -24,7 +24,7 @@ Before running the application, ensure you have:
 The following environment variables are required:
 
 ```env
-DATABASE_URL=postgresql://...  # Your PostgreSQL connection URL
+DATABASE_URL=postgresql://user:password@host:5432/database  # Your PostgreSQL connection URL (default port: 5432)
 OPENAI_API_KEY=sk-...         # Your OpenAI API key
 ```
 
