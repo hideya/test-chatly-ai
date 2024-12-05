@@ -52,14 +52,25 @@ Before running the application, ensure you have:
 - PostgreSQL database
 - OpenAI API key
 
-## Environment Variables
+## Environment Setup
 
+1. Copy the template environment file:
+   ```bash
+   cp .env.template .env
+   ```
+
+2. Update the `.env` file with your credentials:
+   - Set your PostgreSQL database URL
+   - Add your OpenAI API key
+   
 The following environment variables are required:
 
 ```env
-DATABASE_URL=postgresql://...  # PostgreSQL connection URL
+DATABASE_URL=postgresql://...  # Your PostgreSQL connection URL
 OPENAI_API_KEY=sk-...         # Your OpenAI API key
 ```
+
+Note: Never commit your `.env` file to version control.
 
 ## Installation
 
