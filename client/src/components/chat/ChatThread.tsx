@@ -7,7 +7,8 @@ import { Loader2 } from "lucide-react";
 import type { Message } from "@db/schema";
 import 'katex/dist/katex.min.css';
 import { InlineMath, BlockMath } from 'react-katex';
-import ReactMarkdown, { Components } from 'react-markdown';
+import ReactMarkdown from 'react-markdown';
+import type { CodeComponent } from 'react-markdown/lib/ast-to-react';
 
 interface ChatThreadProps {
   threadId: number | null;
@@ -50,25 +51,20 @@ export default function ChatThread({ threadId, onThreadCreated }: ChatThreadProp
       }
     };
 
-    // Call immediately
     scrollToBottom();
-    
-    // And after a short delay to ensure content is rendered
     const timeoutId = setTimeout(scrollToBottom, 100);
-    
-    // Keep the focus behavior for AI responses
+
     if (messages.length > 0 && messages[messages.length - 1].role === "assistant") {
       setTimeout(() => {
         chatInputRef.current?.focus();
       }, 100);
     }
-    
+
     return () => clearTimeout(timeoutId);
   }, [messages]);
 
   useEffect(() => {
     if (threadId !== null && !isLoadingMessages) {
-      // Small delay to ensure DOM is updated
       setTimeout(() => {
         chatInputRef.current?.focus();
       }, 0);
@@ -91,55 +87,12 @@ export default function ChatThread({ threadId, onThreadCreated }: ChatThreadProp
     );
   }
 
-  const renderInlineMath = (content: string, messageId: number, contentIndex: number): React.ReactNode[] => {
-    const inlineElements: React.ReactNode[] = [];
-    let lastIndex = 0;
-    const inlineRegex = /\\\((.*?)\\\)/g;
-    let match: RegExpExecArray | null;
-    let inlineCount = 0;
-
-    while ((match = inlineRegex.exec(content)) !== null) {
-      if (match.index > lastIndex) {
-        inlineElements.push(
-          <span key={`text-${messageId}-${contentIndex}-${inlineCount}`}>
-            {content.slice(lastIndex, match.index)}
-          </span>
-        );
-      }
-      
-      const mathContent = (match[1] || '').trim();
-      inlineElements.push(
-        <InlineMath 
-          key={`inline-math-${messageId}-${contentIndex}-${inlineCount}`}
-          math={mathContent}
-          renderError={(error) => (
-            <span className="text-destructive">
-              Error rendering math: {error.message}
-            </span>
-          )}
-        />
-      );
-      lastIndex = match.index + match[0].length;
-      inlineCount++;
-    }
-    
-    if (lastIndex < content.length) {
-      inlineElements.push(
-        <span key={`text-${messageId}-${contentIndex}-${inlineCount}`}>
-          {content.slice(lastIndex)}
-        </span>
-      );
-    }
-    
-    return inlineElements;
-  };
-
   const renderMessageContent = (content: string, messageId: number) => {
     if (!content) return null;
 
-    // Process block math expressions first
+    // Process block math expressions
     const processedContent = content.replace(
-      /^\s*\\\[\s*\n([\s\S]*?)\n\s*\\\]\s*$/g,
+      /\\\[([\s\S]*?)\\\]/g,
       (_, math) => `\`\`\`math\n${math.trim()}\n\`\`\``
     );
 
@@ -149,23 +102,29 @@ export default function ChatThread({ threadId, onThreadCreated }: ChatThreadProp
       (_, math) => `\`math:${math.trim()}\``
     );
 
+    const components = {
+      code: ({ node, inline, className, children, ...props }: Parameters<CodeComponent>[0]) => {
+        const match = /language-(\w+)/.exec(className || '');
+        const content = String(children).trim();
+        
+        if (match && match[1] === 'math') {
+          return <BlockMath math={content} />;
+        }
+        if (content.startsWith('math:')) {
+          return <InlineMath math={content.slice(5)} />;
+        }
+        return (
+          <code className={className} {...props}>
+            {children}
+          </code>
+        );
+      }
+    };
+
     return (
       <div key={`message-content-${messageId}`}>
         <ReactMarkdown
-          components={{
-            code: ({ inline, className, children }) => {
-              const match = /language-(\w+)/.exec(className || '');
-              const content = String(children).trim();
-              
-              if (match && match[1] === 'math') {
-                return <BlockMath math={content} />;
-              }
-              if (content.startsWith('math:')) {
-                return <InlineMath math={content.slice(5)} />;
-              }
-              return <code className={className}>{children}</code>;
-            }
-          }}
+          components={components}
           className="markdown-content prose dark:prose-invert max-w-none"
         >
           {finalContent}
