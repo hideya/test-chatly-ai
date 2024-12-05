@@ -1,4 +1,4 @@
-# Cimple AI Chat App
+# Simple AI Chat App
 
 A full-featured ChatGPT-like application providing conversational AI capabilities with user authentication and chat management functionality. The system implements thread-based conversations with OpenAI integration and responsive UI interactions.
 
