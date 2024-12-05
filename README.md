@@ -48,6 +48,21 @@ Note: Never commit your `.env` file to version control.
    npm run db:push
    ```
 
+## Building the Application
+
+After installation, build the application:
+
+```bash
+npm run build
+```
+
+This command will:
+- Build the frontend React application
+- Compile the backend TypeScript code
+- Prepare the application for production deployment
+
+The build artifacts will be created in the `dist` directory.
+
 ## Development
 
 To start the development server:
@@ -73,6 +88,7 @@ This will start both the frontend and backend servers on port 5000.
 │   └── openai.ts        # OpenAI integration
 └── db/                  # Database schemas and migrations
 ```
+
 ## Features
 
 ### User Authentication & Security
@@ -146,9 +162,6 @@ This will start both the frontend and backend servers on port 5000.
   - [PostgreSQL](https://www.postgresql.org/) database
   - [Drizzle ORM](https://orm.drizzle.team/) for database management
   - [OpenAI API](https://platform.openai.com/docs/introduction) integration
-
-
-
 
 ## License
 
