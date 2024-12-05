@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useChat } from "../../hooks/use-chat";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -7,7 +7,7 @@ import { Loader2 } from "lucide-react";
 import type { Message } from "@db/schema";
 import 'katex/dist/katex.min.css';
 import { InlineMath, BlockMath } from 'react-katex';
-import ReactMarkdown from 'react-markdown';
+import ReactMarkdown, { Components } from 'react-markdown';
 
 interface ChatThreadProps {
   threadId: number | null;
@@ -137,39 +137,9 @@ export default function ChatThread({ threadId, onThreadCreated }: ChatThreadProp
   const renderMessageContent = (content: string, messageId: number) => {
     if (!content) return null;
 
-    // Function to handle LaTeX expressions
-    const renderers = {
-      // For inline code, check if it's LaTeX and render accordingly
-      code: ({ children }: { children: string }) => {
-        if (children.startsWith('math:')) {
-          const mathContent = children.slice(5).trim();
-          return <InlineMath math={mathContent} />;
-        }
-        return <code>{children}</code>;
-      },
-      // For code blocks, check if it's LaTeX and render accordingly
-      pre: ({ children }: { children: React.ReactNode }) => {
-        const childrenArray = React.Children.toArray(children);
-        const codeChild = childrenArray[0] as React.ReactElement;
-        
-        if (codeChild?.props?.className === 'language-math') {
-          return (
-            <div className="mt-6 mb-6">
-              <BlockMath math={codeChild.props.children} />
-            </div>
-          );
-        }
-        return <pre>{children}</pre>;
-      },
-      // Custom paragraph handling to preserve whitespace
-      p: ({ children }: { children: React.ReactNode }) => (
-        <p className="whitespace-pre-wrap">{children}</p>
-      )
-    };
-
     // Process block math expressions first
     const processedContent = content.replace(
-      /^\s*\\\[\s*\n(.*?)\n\s*\\\]\s*$/gms,
+      /^\s*\\\[\s*\n([\s\S]*?)\n\s*\\\]\s*$/g,
       (_, math) => `\`\`\`math\n${math.trim()}\n\`\`\``
     );
 
@@ -182,7 +152,20 @@ export default function ChatThread({ threadId, onThreadCreated }: ChatThreadProp
     return (
       <div key={`message-content-${messageId}`}>
         <ReactMarkdown
-          components={renderers}
+          components={{
+            code: ({ inline, className, children }) => {
+              const match = /language-(\w+)/.exec(className || '');
+              const content = String(children).trim();
+              
+              if (match && match[1] === 'math') {
+                return <BlockMath math={content} />;
+              }
+              if (content.startsWith('math:')) {
+                return <InlineMath math={content.slice(5)} />;
+              }
+              return <code className={className}>{children}</code>;
+            }
+          }}
           className="markdown-content prose dark:prose-invert max-w-none"
         >
           {finalContent}
