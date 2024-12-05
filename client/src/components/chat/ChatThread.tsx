@@ -153,7 +153,7 @@ export default function ChatThread({ threadId, onThreadCreated }: ChatThreadProp
           elements.push(
             <div 
               key={`text-content-${messageId}-${elementIndex}-${textContent.substring(0, 10)}`} 
-              className="mb-2 last:mb-0 whitespace-pre-wrap"
+              className="whitespace-pre-wrap"
             >
               {inlineElements}
             </div>
@@ -167,13 +167,13 @@ export default function ChatThread({ threadId, onThreadCreated }: ChatThreadProp
       elements.push(
         <div 
           key={`block-math-${messageId}-${elementIndex}-${mathContent.substring(0, 10)}`} 
-          className="mb-2 last:mb-0"
+          className="mt-6 mb-6"
         >
           <BlockMath math={mathContent} />
         </div>
       );
       
-      lastIndex = match.index + match[0].length;
+      lastIndex = match.index + match[0].length + 1 /* eliminate newline */;
       elementIndex++;
     }
     
@@ -184,7 +184,7 @@ export default function ChatThread({ threadId, onThreadCreated }: ChatThreadProp
       elements.push(
         <div 
           key={`remaining-content-${messageId}-${elementIndex}-${remainingContent.substring(0, 10)}`} 
-          className="mb-2 last:mb-0 whitespace-pre-wrap"
+          className="whitespace-pre-wrap"
         >
           {inlineElements}
         </div>
