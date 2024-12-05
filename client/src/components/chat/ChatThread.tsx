@@ -90,6 +90,39 @@ export default function ChatThread({ threadId, onThreadCreated }: ChatThreadProp
     );
   }
 
+  const renderInlineMath = (content: string): React.ReactNode[] => {
+    const inlineElements: React.ReactNode[] = [];
+    let lastIndex = 0;
+    const inlineRegex = /\\\((.*?)\\\)/g;
+    let match: RegExpExecArray | null;
+
+    while ((match = inlineRegex.exec(content)) !== null) {
+      if (match.index > lastIndex) {
+        inlineElements.push(content.slice(lastIndex, match.index));
+      }
+      
+      const mathContent = (match[1] || '').trim();
+      inlineElements.push(
+        <InlineMath 
+          key={`inline-${match.index}`} 
+          math={mathContent}
+          renderError={(error) => (
+            <span className="text-destructive">
+              Error rendering math: {error.message}
+            </span>
+          )}
+        />
+      );
+      lastIndex = match.index + match[0].length;
+    }
+    
+    if (lastIndex < content.length) {
+      inlineElements.push(content.slice(lastIndex));
+    }
+    
+    return inlineElements;
+  };
+
   const renderMessageContent = (content: string) => {
     if (!content) return null;
     
@@ -126,33 +159,7 @@ export default function ChatThread({ threadId, onThreadCreated }: ChatThreadProp
     // Handle remaining text and inline math
     let remainingContent = lastIndex === 0 ? content : content.slice(lastIndex);
     if (remainingContent.length > 0) {
-      const inlineElements: React.ReactNode[] = [];
-      lastIndex = 0;
-      const inlineRegex = /\\\((.*?)\\\)/g;
-      
-      while ((match = inlineRegex.exec(remainingContent)) !== null) {
-        if (match.index > lastIndex) {
-          inlineElements.push(remainingContent.slice(lastIndex, match.index));
-        }
-        
-        const mathContent = (match[1] || '').trim();
-        inlineElements.push(
-          <InlineMath 
-            key={`inline-${match.index}`} 
-            math={mathContent}
-            renderError={(error) => (
-              <span className="text-destructive">
-                Error rendering math: {error.message}
-              </span>
-            )}
-          />
-        );
-        lastIndex = match.index + match[0].length;
-      }
-      
-      if (lastIndex < remainingContent.length) {
-        inlineElements.push(remainingContent.slice(lastIndex));
-      }
+      const inlineElements = renderInlineMath(remainingContent);
       
       if (inlineElements.length > 0) {
         elements.push(
