@@ -35,6 +35,11 @@ const ChatInput = forwardRef<ChatInputHandle, ChatInputProps>(({ onSubmit, isLoa
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
+    // Ignore Enter key if IME composition is active
+    if (e.nativeEvent.isComposing) {
+      return;
+    }  
+
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSubmit(e);
