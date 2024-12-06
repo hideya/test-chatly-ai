@@ -6,6 +6,7 @@ import ChatInput, { ChatInputHandle } from "./ChatInput";
 import { Loader2 } from "lucide-react";
 import type { Message } from "@db/schema";
 import 'katex/dist/katex.min.css';
+import type { KatexError } from 'katex';
 import { InlineMath, BlockMath } from 'react-katex';
 
 interface ChatThreadProps {
@@ -111,7 +112,7 @@ export default function ChatThread({ threadId, onThreadCreated }: ChatThreadProp
         <InlineMath 
           key={`inline-math-${messageId}-${contentIndex}-${inlineCount}`}
           math={mathContent}
-          renderError={(error) => (
+          renderError={(error: Error) => (
             <span className="text-destructive">
               Error rendering math: {error.message}
             </span>
