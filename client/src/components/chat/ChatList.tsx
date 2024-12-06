@@ -4,6 +4,17 @@ import { useChat } from "../../hooks/use-chat";
 import { Trash2 } from "lucide-react";
 import type { Thread } from "@db/schema";
 import { formatDistanceToNow } from "date-fns";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { useState } from "react";
 
 interface ChatListProps {
   threads: Thread[];
@@ -17,6 +28,7 @@ export default function ChatList({
   onSelectThread,
 }: ChatListProps) {
   const { deleteThread } = useChat();
+  const [threadToDelete, setThreadToDelete] = useState<Thread | null>(null);
 
   return (
     <div className="h-full flex flex-col">
@@ -53,10 +65,7 @@ export default function ChatList({
                 className="opacity-0 group-hover:opacity-100 hover:bg-destructive hover:text-destructive-foreground transition-opacity duration-200"
                 onClick={(e) => {
                   e.stopPropagation();
-                  deleteThread(thread.id);
-                  if (thread.id === selectedThreadId) {
-                    onSelectThread(0);
-                  }
+                  setThreadToDelete(thread);
                 }}
               >
                 <Trash2 className="h-4 w-4" />
@@ -65,6 +74,34 @@ export default function ChatList({
           ))}
         </div>
       </ScrollArea>
+    <AlertDialog open={!!threadToDelete} onOpenChange={() => setThreadToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure you want to delete this chat?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the chat thread
+              and all its messages.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={() => {
+                if (threadToDelete) {
+                  deleteThread(threadToDelete.id);
+                  if (threadToDelete.id === selectedThreadId) {
+                    onSelectThread(0);
+                  }
+                  setThreadToDelete(null);
+                }
+              }}
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
