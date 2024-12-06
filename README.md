@@ -39,7 +39,7 @@ Important:
 1. Clone the repository:
    ```bash
    git clone <repository-url>
-   cd chatgpt-clone
+   cd <project-name>
    ```
 
 2. Install dependencies:

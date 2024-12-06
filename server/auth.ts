@@ -37,7 +37,7 @@ declare global {
 export function setupAuth(app: Express) {
   const MemoryStore = createMemoryStore(session);
   const sessionSettings: session.SessionOptions = {
-    secret: process.env.REPL_ID || "chatgpt-clone-secret",
+    secret: process.env.REPL_ID || "chatly-ai-secret",
     resave: false,
     saveUninitialized: false,
     cookie: {

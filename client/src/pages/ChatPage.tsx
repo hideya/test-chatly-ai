@@ -23,7 +23,7 @@ export default function ChatPage() {
   return (
     <div className="h-screen flex flex-col">
       <header className="border-b px-6 py-3 flex justify-between items-center">
-        <h1 className="text-xl font-semibold">ChatGPT Clone</h1>
+        <h1 className="text-xl font-semibold">Chatly AI</h1>
         <div className="flex items-center gap-4">
           <span className="text-sm text-muted-foreground">
             {user?.username}
