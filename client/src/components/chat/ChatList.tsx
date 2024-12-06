@@ -54,6 +54,9 @@ export default function ChatList({
                 onClick={(e) => {
                   e.stopPropagation();
                   deleteThread(thread.id);
+                  if (thread.id === selectedThreadId) {
+                    onSelectThread(0);
+                  }
                 }}
               >
                 <Trash2 className="h-4 w-4" />
