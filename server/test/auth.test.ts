@@ -34,18 +34,51 @@ describe('Auth API', () => {
       const response = await request(app).post('/api/auth/login');
       expect(response.status).toBe(401); // Without credentials, should return 401
     });
+
+    it('handles invalid credentials', async () => {
+      const response = await request(app)
+        .post('/api/auth/login')
+        .send({
+          username: 'nonexistent',
+          password: 'wrongpass'
+        });
+      expect(response.status).toBe(401);
+    });
   });
 
   describe('Registration', () => {
     it('successfully registers a new user', async () => {
       const response = await request(app)
-        .post('/api/auth/register')
+        .post('/api/register')
         .send({
           username: 'newuser',
           password: 'password123'
         });
 
       expect(response.status).toBe(200);
+      expect(response.body).toHaveProperty('message', 'Registration successful');
+      expect(response.body.user).toHaveProperty('username', 'newuser');
+    });
+
+    it('prevents duplicate username registration', async () => {
+      // First registration
+      await request(app)
+        .post('/api/register')
+        .send({
+          username: 'duplicateuser',
+          password: 'password123'
+        });
+
+      // Attempt duplicate registration
+      const response = await request(app)
+        .post('/api/register')
+        .send({
+          username: 'duplicateuser',
+          password: 'password123'
+        });
+
+      expect(response.status).toBe(400);
+      expect(response.text).toBe('Username already exists');
     });
   });
 
@@ -53,29 +86,29 @@ describe('Auth API', () => {
     it('successfully logs out user', async () => {
       // Register and login
       await agent
-        .post('/api/auth/register')
+        .post('/api/register')
         .send({
           username: 'logouttest',
           password: 'testpass123'
         });
 
       await agent
-        .post('/api/auth/login')
+        .post('/api/login')
         .send({
           username: 'logouttest',
           password: 'testpass123'
         });
 
       // Verify logged in
-      const preLogoutResponse = await agent.get('/api/auth/user');
+      const preLogoutResponse = await agent.get('/api/user');
       expect(preLogoutResponse.status).toBe(200);
 
       // Logout
-      const logoutResponse = await agent.post('/api/auth/logout');
+      const logoutResponse = await agent.post('/api/logout');
       expect(logoutResponse.status).toBe(200);
 
       // Verify logged out
-      const postLogoutResponse = await agent.get('/api/auth/user');
+      const postLogoutResponse = await agent.get('/api/user');
       expect(postLogoutResponse.status).toBe(401);
     });
   });
@@ -84,14 +117,14 @@ describe('Auth API', () => {
     it('maintains user session across requests', async () => {
       // Register and login
       await agent
-        .post('/api/auth/register')
+        .post('/api/register')
         .send({
           username: 'sessiontest',
           password: 'testpass123'
         });
 
       await agent
-        .post('/api/auth/login')
+        .post('/api/login')
         .send({
           username: 'sessiontest',
           password: 'testpass123'
@@ -99,9 +132,9 @@ describe('Auth API', () => {
 
       // Make multiple requests to verify session
       const responses = await Promise.all([
-        agent.get('/api/auth/user'),
-        agent.get('/api/auth/user'),
-        agent.get('/api/auth/user')
+        agent.get('/api/user'),
+        agent.get('/api/user'),
+        agent.get('/api/user')
       ]);
 
       responses.forEach(response => {

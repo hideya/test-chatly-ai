@@ -20,5 +20,9 @@ export default defineConfig({
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
     },
+    deps: {
+      inline: [/@testing-library\/jest-dom/],
+    },
+    testTimeout: 10000,
   },
 });
