@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { Loader2 } from "lucide-react";
 import { useUser } from "../hooks/use-user";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -27,7 +28,10 @@ export default function AuthPage() {
     form.setFocus("username");
   }, [form.setFocus]);
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const onSubmit = async (data: InsertUser) => {
+    setIsSubmitting(true);
     try {
       const result = await (isLogin ? login(data) : register(data));
       if (!result.ok) {
@@ -43,6 +47,8 @@ export default function AuthPage() {
         title: "Error",
         description: "An unexpected error occurred",
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -72,8 +78,19 @@ export default function AuthPage() {
               />
             </div>
             <div className="flex flex-col space-y-2">
-              <Button type="submit" className="w-full transition-transform active:scale-95">
-                {isLogin ? "Login" : "Register"}
+              <Button 
+                type="submit" 
+                className="w-full transition-transform active:scale-95"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    {isLogin ? "Logging in..." : "Registering..."}
+                  </>
+                ) : (
+                  isLogin ? "Login" : "Register"
+                )}
               </Button>
               <Button
                 type="button"
