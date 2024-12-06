@@ -29,6 +29,7 @@ export default function ChatList({
 }: ChatListProps) {
   const { deleteThread } = useChat();
   const [threadToDelete, setThreadToDelete] = useState<Thread | null>(null);
+  const [deletingThreadId, setDeletingThreadId] = useState<number | null>(null);
 
   return (
     <div className="h-full flex flex-col">
@@ -46,9 +47,12 @@ export default function ChatList({
           {threads.map((thread) => (
             <div
               key={thread.id}
-              className={`flex items-center justify-between p-3 rounded-lg hover:bg-muted cursor-pointer group ${
-                selectedThreadId === thread.id ? "bg-muted" : ""
-              }`}
+              className={`flex items-center justify-between p-3 rounded-lg hover:bg-muted cursor-pointer group 
+                ${selectedThreadId === thread.id ? "bg-muted" : ""}
+                transition-all duration-200
+                data-[state=deleting]:animate-out data-[state=deleting]:fade-out-0 data-[state=deleting]:slide-out-to-left
+              `}
+              data-state={deletingThreadId === thread.id ? "deleting" : "active"}
               onClick={() => onSelectThread(thread.id)}
             >
               <div className="truncate flex-1">
@@ -89,11 +93,15 @@ export default function ChatList({
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
               onClick={() => {
                 if (threadToDelete) {
-                  deleteThread(threadToDelete.id);
-                  if (threadToDelete.id === selectedThreadId) {
-                    onSelectThread(0);
-                  }
-                  setThreadToDelete(null);
+                  setDeletingThreadId(threadToDelete.id);
+                  // Add delay to allow animation to complete
+                  setTimeout(() => {
+                    deleteThread(threadToDelete.id);
+                    if (threadToDelete.id === selectedThreadId) {
+                      onSelectThread(0);
+                    }
+                    setThreadToDelete(null);
+                  }, 200); // Match duration-200 from the animation
                 }
               }}
             >
