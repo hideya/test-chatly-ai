@@ -113,11 +113,6 @@ export default function ChatThread({ threadId, onThreadCreated }: ChatThreadProp
           <InlineMath 
             key={`inline-math-${messageId}-${contentIndex}-${inlineCount}`}
             math={mathContent}
-            renderError={(error: ParseError) => (
-              <span className="text-destructive">
-                Error rendering math: {error.message}
-              </span>
-            )}
           />
         );
         lastIndex = match.index + match[0].length;
