@@ -1,12 +1,12 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useChat } from "../../hooks/use-chat";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import ChatInput, { ChatInputHandle } from "./ChatInput";
 import { Loader2 } from "lucide-react";
 import type { Message } from "@db/schema";
-import ReactMarkdown from 'react-markdown';
-import { cn } from "@/lib/utils";
+import 'katex/dist/katex.min.css';
+import { InlineMath, BlockMath } from 'react-katex';
 
 interface ChatThreadProps {
   threadId: number | null;
@@ -49,20 +49,25 @@ export default function ChatThread({ threadId, onThreadCreated }: ChatThreadProp
       }
     };
 
+    // Call immediately
     scrollToBottom();
+    
+    // And after a short delay to ensure content is rendered
     const timeoutId = setTimeout(scrollToBottom, 100);
-
+    
+    // Keep the focus behavior for AI responses
     if (messages.length > 0 && messages[messages.length - 1].role === "assistant") {
       setTimeout(() => {
         chatInputRef.current?.focus();
       }, 100);
     }
-
+    
     return () => clearTimeout(timeoutId);
   }, [messages]);
 
   useEffect(() => {
     if (threadId !== null && !isLoadingMessages) {
+      // Small delay to ensure DOM is updated
       setTimeout(() => {
         chatInputRef.current?.focus();
       }, 0);
@@ -85,32 +90,108 @@ export default function ChatThread({ threadId, onThreadCreated }: ChatThreadProp
     );
   }
 
+  const renderInlineMath = (content: string, messageId: number, contentIndex: number): React.ReactNode[] => {
+    const inlineElements: React.ReactNode[] = [];
+    let lastIndex = 0;
+    const inlineRegex = /\\\((.*?)\\\)/g;
+    let match: RegExpExecArray | null;
+    let inlineCount = 0;
+
+    while ((match = inlineRegex.exec(content)) !== null) {
+      if (match.index > lastIndex) {
+        inlineElements.push(
+          <span key={`text-${messageId}-${contentIndex}-${inlineCount}`}>
+            {content.slice(lastIndex, match.index)}
+          </span>
+        );
+      }
+      
+      const mathContent = (match[1] || '').trim();
+      inlineElements.push(
+        <InlineMath 
+          key={`inline-math-${messageId}-${contentIndex}-${inlineCount}`}
+          math={mathContent}
+          renderError={(error) => (
+            <span className="text-destructive">
+              Error rendering math: {error.message}
+            </span>
+          )}
+        />
+      );
+      lastIndex = match.index + match[0].length;
+      inlineCount++;
+    }
+    
+    if (lastIndex < content.length) {
+      inlineElements.push(
+        <span key={`text-${messageId}-${contentIndex}-${inlineCount}`}>
+          {content.slice(lastIndex)}
+        </span>
+      );
+    }
+    
+    return inlineElements;
+  };
+
   const renderMessageContent = (content: string, messageId: number) => {
     if (!content) return null;
-
-    return (
-      <div key={`message-content-${messageId}`}>
-        <ReactMarkdown
-          className="markdown-content prose dark:prose-invert max-w-none"
-          components={{
-            code: ({ className, children, ...props }) => {
-              const match = /language-(\w+)/.exec(className || '');
-              return (
-                <code className={cn(
-                  'block',
-                  match ? className : 'whitespace-pre-wrap',
-                  !match && 'bg-muted px-[0.3rem] py-[0.2rem] rounded text-sm'
-                )} {...props}>
-                  {children}
-                </code>
-              );
-            }
-          }}
+    
+    const elements: React.ReactNode[] = [];
+    let lastIndex = 0;
+    let elementIndex = 0;
+    
+    // Match block math expressions between lines containing only \[ and \], allowing flexible whitespace
+    const blockRegex = /^\s*\\\[\s*\n(.*)\n\s*\\\]\s*$/gm;
+    let match: RegExpExecArray | null;
+    
+    while ((match = blockRegex.exec(content)) !== null) {
+      // Handle text before the math block
+      if (match.index > lastIndex) {
+        const textContent = content.slice(lastIndex, match.index);
+        if (textContent.length) {
+          const inlineElements = renderInlineMath(textContent, messageId, elementIndex);
+          elements.push(
+            <div 
+              key={`text-content-${messageId}-${elementIndex}-${textContent.substring(0, 10)}`} 
+              className="whitespace-pre-wrap"
+            >
+              {inlineElements}
+            </div>
+          );
+        }
+        elementIndex++;
+      }
+      
+      // Add block math component
+      const mathContent = (match[1] || '').trim();
+      elements.push(
+        <div 
+          key={`block-math-${messageId}-${elementIndex}-${mathContent.substring(0, 10)}`} 
+          className="mt-6 mb-6"
         >
-          {content}
-        </ReactMarkdown>
-      </div>
-    );
+          <BlockMath math={mathContent} />
+        </div>
+      );
+      
+      lastIndex = match.index + match[0].length + 1 /* eliminate newline */;
+      elementIndex++;
+    }
+    
+    // Handle remaining text and inline math
+    const remainingContent = content.slice(lastIndex);
+    if (remainingContent.length) {
+      const inlineElements = renderInlineMath(remainingContent, messageId, elementIndex);
+      elements.push(
+        <div 
+          key={`remaining-content-${messageId}-${elementIndex}-${remainingContent.substring(0, 10)}`} 
+          className="whitespace-pre-wrap"
+        >
+          {inlineElements}
+        </div>
+      );
+    }
+    
+    return elements;
   };
 
   return (
