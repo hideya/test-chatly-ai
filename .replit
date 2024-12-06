@@ -9,48 +9,22 @@ deploymentTarget = "cloudrun"
 build = ["npm", "run", "build"]
 run = ["npm", "run", "start"]
 
-[[ports]]
-localPort = 3000
-externalPort = 3000
+# Port configuration
 
 [[ports]]
-localPort = 5000
-externalPort = 80
+# Frontend development server
+internalPort = 3000 # Vite dev server
+externalPort = 3000 # External access port
 
 [[ports]]
-localPort = 33535
-externalPort = 3001
+# Backend server
+internalPort = 5000 # Express server
+externalPort = 80   # Production HTTP port
 
-[[ports]]
-localPort = 33929
-externalPort = 3003
-
-[[ports]]
-localPort = 34755
-externalPort = 5000
-
-[[ports]]
-localPort = 34757
-externalPort = 4200
-
-[[ports]]
-localPort = 37541
-externalPort = 6800
-
-[[ports]]
-localPort = 40849
-externalPort = 6000
-
-[[ports]]
-localPort = 41477
-externalPort = 5173
-
-[[ports]]
-localPort = 46051
-externalPort = 3002
+# Workflow definitions
 
 [workflows]
-runButton = "Project"
+runButton = "Project" # Define what happens when Run button is clicked
 
 [[workflows.workflow]]
 name = "Project"
@@ -102,6 +76,8 @@ task = "packager.installForAll"
 task = "shell.exec"
 args = "cd client && npm install && npm run dev"
 waitForPort = 3000
+
+# Test configuration
 
 [[workflows.workflow]]
 name = "Frontend Tests"
