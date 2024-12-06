@@ -50,7 +50,7 @@ export default function ChatList({
               <Button
                 variant="ghost"
                 size="icon"
-                className="opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                className="opacity-0 group-hover:opacity-100 hover:bg-destructive hover:text-destructive-foreground transition-opacity duration-200"
                 onClick={(e) => {
                   e.stopPropagation();
                   deleteThread(thread.id);
