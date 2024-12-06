@@ -5,10 +5,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import ChatInput, { ChatInputHandle } from "./ChatInput";
 import { Loader2 } from "lucide-react";
 import type { Message } from "@db/schema";
-import 'katex/dist/katex.min.css';
-import { InlineMath, BlockMath } from 'react-katex';
 import ReactMarkdown from 'react-markdown';
-import type { CodeComponent } from 'react-markdown/lib/ast-to-react';
 
 interface ChatThreadProps {
   threadId: number | null;
@@ -90,29 +87,9 @@ export default function ChatThread({ threadId, onThreadCreated }: ChatThreadProp
   const renderMessageContent = (content: string, messageId: number) => {
     if (!content) return null;
 
-    // Process block math expressions
-    const processedContent = content.replace(
-      /\\\[([\s\S]*?)\\\]/g,
-      (_, math) => `\`\`\`math\n${math.trim()}\n\`\`\``
-    );
-
-    // Process inline math expressions
-    const finalContent = processedContent.replace(
-      /\\\((.*?)\\\)/g,
-      (_, math) => `\`math:${math.trim()}\``
-    );
-
     const components = {
-      code: ({ node, inline, className, children, ...props }: Parameters<CodeComponent>[0]) => {
+      code: ({ className, children, ...props }: any) => {
         const match = /language-(\w+)/.exec(className || '');
-        const content = String(children).trim();
-        
-        if (match && match[1] === 'math') {
-          return <BlockMath math={content} />;
-        }
-        if (content.startsWith('math:')) {
-          return <InlineMath math={content.slice(5)} />;
-        }
         return (
           <code className={className} {...props}>
             {children}
@@ -127,7 +104,7 @@ export default function ChatThread({ threadId, onThreadCreated }: ChatThreadProp
           components={components}
           className="markdown-content prose dark:prose-invert max-w-none"
         >
-          {finalContent}
+          {content}
         </ReactMarkdown>
       </div>
     );
