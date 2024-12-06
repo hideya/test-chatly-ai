@@ -91,15 +91,16 @@ export default function ChatThread({ threadId, onThreadCreated }: ChatThreadProp
     );
   }
 
-  const renderInlineMath = (content: string, messageId: number, contentIndex: number): React.ReactNode[] => {
+  const renderInlineMathAndBold = (content: string, messageId: number, contentIndex: number): React.ReactNode[] => {
     try {
       const inlineElements: React.ReactNode[] = [];
       let lastIndex = 0;
-      const inlineRegex = /\\\((.*?)\\\)/g;
+      // Match inline math \(...\), bold text **...**, and code `...` patterns
+      const combinedRegex = /(\\\((.*?)\\\)|\*\*(.*?)\*\*|`(.*?)`)/g;
       let match: RegExpExecArray | null;
       let inlineCount = 0;
-
-      while ((match = inlineRegex.exec(content)) !== null) {
+      
+      while ((match = combinedRegex.exec(content)) !== null) {
         if (match.index > lastIndex) {
           inlineElements.push(
             <span key={`text-${messageId}-${contentIndex}-${inlineCount}`}>
@@ -108,13 +109,39 @@ export default function ChatThread({ threadId, onThreadCreated }: ChatThreadProp
           );
         }
         
-        const mathContent = (match[1] || '').trim();
-        inlineElements.push(
-          <InlineMath 
-            key={`inline-math-${messageId}-${contentIndex}-${inlineCount}`}
-            math={mathContent}
-          />
-        );
+        if (match[0].startsWith('\\(')) {
+          // Handle math content
+          const mathContent = (match[2] || '').trim();
+          inlineElements.push(
+            <InlineMath 
+              key={`inline-math-${messageId}-${contentIndex}-${inlineCount}`}
+              math={mathContent}
+            />
+          );
+        } else if (match[0].startsWith('*')) {
+          // Handle bold content
+          const boldContent = match[3] || '';
+          inlineElements.push(
+            <strong 
+              key={`bold-${messageId}-${contentIndex}-${inlineCount}`}
+              className="font-bold"
+            >
+              {boldContent}
+            </strong>
+          );
+        } else {
+          // Handle code content
+          const codeContent = match[4] || '';
+          inlineElements.push(
+            <code 
+              key={`code-${messageId}-${contentIndex}-${inlineCount}`}
+              className="rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm"
+            >
+              {codeContent}
+            </code>
+          );
+        }
+        
         lastIndex = match.index + match[0].length;
         inlineCount++;
       }
@@ -135,7 +162,7 @@ export default function ChatThread({ threadId, onThreadCreated }: ChatThreadProp
   };
 
   const pushInlineMathElement = (elements: React.ReactNode[], textContent: string, messageId: number, elementIndex: number): void => {
-    const inlineElements = renderInlineMath(textContent, messageId, elementIndex);
+    const inlineElements = renderInlineMathAndBold(textContent, messageId, elementIndex);
     elements.push(
       <div 
         key={`text-content-${messageId}-${elementIndex}-${textContent.substring(0, 10)}`} 
@@ -157,19 +184,38 @@ export default function ChatThread({ threadId, onThreadCreated }: ChatThreadProp
     );
   };
 
+  // Add this new helper function
+  const pushCodeBlockElement = (
+    elements: React.ReactNode[], 
+    codeContent: string, 
+    messageId: number, 
+    elementIndex: number
+  ): void => {
+    elements.push(
+      <pre 
+        key={`code-block-${messageId}-${elementIndex}`}
+        className="mt-2 mb-2 overflow-x-auto"
+      >
+        <code className="block rounded-lg bg-muted p-4 text-sm font-mono">
+          {codeContent}
+        </code>
+      </pre>
+    );
+  };
+
   const renderMessageContent = (content: string, messageId: number) => {
     if (!content) return null;
     
     const elements: React.ReactNode[] = [];
     let lastIndex = 0;
     let elementIndex = 0;
-    
-    // Match block math expressions between lines containing only \[ and \], allowing flexible whitespace
-    const blockRegex = /^\s*\\\[\s*\n(.*)\n\s*\\\]\s*$/gm;
+
+    // Match block math expressions and code blocks
+    const blockRegex = /^\s*(?:\\\[\s*\n(.*)\n\s*\\\]\s*$|```(?:\w+)?\n([\s\S]*?)\n```)/gm;
     let match: RegExpExecArray | null;
     
     while ((match = blockRegex.exec(content)) !== null) {
-      // Handle text before the math block
+      // Handle text before the block
       if (match.index > lastIndex) {
         const textContent = content.slice(lastIndex, match.index);
         if (textContent.length) {
@@ -178,11 +224,18 @@ export default function ChatThread({ threadId, onThreadCreated }: ChatThreadProp
         }
       }
       
-      // Add block math component
-      const mathContent = (match[1] || '').trim();
-      pushBlockMathElement(elements, mathContent, messageId, elementIndex);
+      if (match[1] !== undefined) {
+        // Add block math component
+        const mathContent = match[1].trim();
+        pushBlockMathElement(elements, mathContent, messageId, elementIndex);
+      } else if (match[2] !== undefined) {
+        // Add code block component
+        const codeContent = match[2];
+        pushCodeBlockElement(elements, codeContent, messageId, elementIndex);
+      }
+      
       elementIndex++;
-      lastIndex = match.index + match[0].length + 1 /* eliminate the tailingnewline */;
+      lastIndex = match.index + match[0].length;
     }
     
     // Handle remaining text and inline math
