@@ -47,7 +47,10 @@ export function useChat() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message }),
       });
-      if (!response.ok) throw new Error("Failed to send message");
+      if (!response.ok) {
+        const errorMessage = await response.text();
+        throw new Error(errorMessage || "Failed to send message");
+      }
       return response.json();
     },
     onSuccess: (_, variables) => {
