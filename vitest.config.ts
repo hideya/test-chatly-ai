@@ -12,7 +12,7 @@ export default defineConfig({
   },
   test: {
     globals: true,
-    environment: 'jsdom',
+    environment: process.env.TEST_ENV === 'server' ? 'node:test' : 'jsdom',
     setupFiles: process.env.TEST_ENV === 'server' 
       ? ['./server/test/setup.ts']
       : ['./client/src/test/setup.ts'],

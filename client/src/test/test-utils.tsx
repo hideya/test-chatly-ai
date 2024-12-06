@@ -13,11 +13,14 @@ const createTestQueryClient = () =>
 
 export function renderWithProviders(ui: React.ReactElement) {
   const testQueryClient = createTestQueryClient();
-  return {
-    ...render(
+  
+  function Wrapper({ children }: { children: React.ReactNode }) {
+    return (
       <QueryClientProvider client={testQueryClient}>
-        {ui}
+        {children}
       </QueryClientProvider>
-    ),
-  };
+    );
+  }
+
+  return render(ui, { wrapper: Wrapper });
 }

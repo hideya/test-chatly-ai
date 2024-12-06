@@ -13,14 +13,14 @@ vi.mock('../hooks/use-user', () => ({
 }));
 
 describe('AuthPage', () => {
-  it('認証ページが正しくレンダリングされる', () => {
+  it('renders authentication page correctly', () => {
     renderWithProviders(<AuthPage />);
     expect(screen.getByRole('heading')).toBeInTheDocument();
   });
 
-  it('ログインフォームが表示される', () => {
+  it('displays login form', () => {
     renderWithProviders(<AuthPage />);
-    expect(screen.getByLabelText(/メールアドレス/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/パスワード/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/Username/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/Password/i)).toBeInTheDocument();
   });
 });
