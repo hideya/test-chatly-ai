@@ -177,7 +177,7 @@ export default function ChatThread({ threadId, onThreadCreated }: ChatThreadProp
     elements.push(
       <div 
         key={`block-math-${messageId}-${elementIndex}-${mathContent.substring(0, 10)}`} 
-        className="mt-6 mb-6"
+        className="mt-6 mb-6 overflow-x-auto"
       >
         <BlockMath math={mathContent} />
       </div>
