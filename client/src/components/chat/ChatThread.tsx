@@ -139,6 +139,29 @@ export default function ChatThread({ threadId, onThreadCreated }: ChatThreadProp
     }
   };
 
+  const pushInlineMathElement = (elements: React.ReactNode[], textContent: string, messageId: number, elementIndex: number): void => {
+    const inlineElements = renderInlineMath(textContent, messageId, elementIndex);
+    elements.push(
+      <div 
+        key={`text-content-${messageId}-${elementIndex}-${textContent.substring(0, 10)}`} 
+        className="whitespace-pre-wrap"
+      >
+        {inlineElements}
+      </div>
+    );
+  };
+
+  const pushBlockMathElement = (elements: React.ReactNode[], mathContent: string, messageId: number, elementIndex: number): void => {
+    elements.push(
+      <div 
+        key={`block-math-${messageId}-${elementIndex}-${mathContent.substring(0, 10)}`} 
+        className="mt-6 mb-6"
+      >
+        <BlockMath math={mathContent} />
+      </div>
+    );
+  };
+
   const renderMessageContent = (content: string, messageId: number) => {
     if (!content) return null;
     
@@ -155,46 +178,22 @@ export default function ChatThread({ threadId, onThreadCreated }: ChatThreadProp
       if (match.index > lastIndex) {
         const textContent = content.slice(lastIndex, match.index);
         if (textContent.length) {
-          const inlineElements = renderInlineMath(textContent, messageId, elementIndex);
-          elements.push(
-            <div 
-              key={`text-content-${messageId}-${elementIndex}-${textContent.substring(0, 10)}`} 
-              className="whitespace-pre-wrap"
-            >
-              {inlineElements}
-            </div>
-          );
+          pushInlineMathElement(elements, textContent, messageId, elementIndex);
+          elementIndex++;
         }
-        elementIndex++;
       }
       
       // Add block math component
       const mathContent = (match[1] || '').trim();
-      elements.push(
-        <div 
-          key={`block-math-${messageId}-${elementIndex}-${mathContent.substring(0, 10)}`} 
-          className="mt-6 mb-6"
-        >
-          <BlockMath math={mathContent} />
-        </div>
-      );
-      
-      lastIndex = match.index + match[0].length + 1 /* eliminate newline */;
+      pushBlockMathElement(elements, mathContent, messageId, elementIndex);
       elementIndex++;
+      lastIndex = match.index + match[0].length + 1 /* eliminate the tailingnewline */;
     }
     
     // Handle remaining text and inline math
     const remainingContent = content.slice(lastIndex);
     if (remainingContent.length) {
-      const inlineElements = renderInlineMath(remainingContent, messageId, elementIndex);
-      elements.push(
-        <div 
-          key={`remaining-content-${messageId}-${elementIndex}-${remainingContent.substring(0, 10)}`} 
-          className="whitespace-pre-wrap"
-        >
-          {inlineElements}
-        </div>
-      );
+      pushInlineMathElement(elements, remainingContent, messageId, elementIndex);
     }
     
     return elements;
