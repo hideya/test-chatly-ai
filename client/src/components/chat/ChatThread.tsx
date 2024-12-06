@@ -6,6 +6,7 @@ import ChatInput, { ChatInputHandle } from "./ChatInput";
 import { Loader2 } from "lucide-react";
 import type { Message } from "@db/schema";
 import ReactMarkdown from 'react-markdown';
+import { cn } from "@/lib/utils";
 
 interface ChatThreadProps {
   threadId: number | null;
@@ -87,22 +88,24 @@ export default function ChatThread({ threadId, onThreadCreated }: ChatThreadProp
   const renderMessageContent = (content: string, messageId: number) => {
     if (!content) return null;
 
-    const components = {
-      code: ({ className, children, ...props }: any) => {
-        const match = /language-(\w+)/.exec(className || '');
-        return (
-          <code className={className} {...props}>
-            {children}
-          </code>
-        );
-      }
-    };
-
     return (
       <div key={`message-content-${messageId}`}>
         <ReactMarkdown
-          components={components}
           className="markdown-content prose dark:prose-invert max-w-none"
+          components={{
+            code: ({ className, children, ...props }) => {
+              const match = /language-(\w+)/.exec(className || '');
+              return (
+                <code className={cn(
+                  'block',
+                  match ? className : 'whitespace-pre-wrap',
+                  !match && 'bg-muted px-[0.3rem] py-[0.2rem] rounded text-sm'
+                )} {...props}>
+                  {children}
+                </code>
+              );
+            }
+          }}
         >
           {content}
         </ReactMarkdown>
