@@ -173,6 +173,30 @@ export default function ChatThread({ threadId, onThreadCreated }: ChatThreadProp
     );
   };
 
+  // Updated helper function to include h1
+  const pushHeadingElement = (
+    elements: React.ReactNode[],
+    content: string,
+    level: 'h1' | 'h2' | 'h3',
+    messageId: number,
+    elementIndex: number
+  ): void => {
+    const HeadingTag = level;
+    const className = {
+      h1: 'text-2xl font-bold mt-6 mb-4',
+      h2: 'text-xl font-semibold mt-5 mb-3',
+      h3: 'text-lg font-medium mt-4 mb-2'
+    }[level];
+    elements.push(
+      <HeadingTag
+        key={`${level}-${messageId}-${elementIndex}`}
+        className={className}
+      >
+        {renderInlineMathAndBold(content, messageId, elementIndex)}
+      </HeadingTag>
+    );
+  };
+
   const pushBlockMathElement = (elements: React.ReactNode[], mathContent: string, messageId: number, elementIndex: number): void => {
     elements.push(
       <div 
@@ -210,38 +234,77 @@ export default function ChatThread({ threadId, onThreadCreated }: ChatThreadProp
     let lastIndex = 0;
     let elementIndex = 0;
 
-    // Match block math expressions and code blocks
-    const blockRegex = /^\s*(?:\\\[\s*\n(.*)\n\s*\\\]\s*$|```(?:\w+)?\n([\s\S]*?)\n```)/gm;
-    let match: RegExpExecArray | null;
-    
-    while ((match = blockRegex.exec(content)) !== null) {
-      // Handle text before the block
-      if (match.index > lastIndex) {
-        const textContent = content.slice(lastIndex, match.index);
-        if (textContent.length) {
-          pushInlineMathElement(elements, textContent, messageId, elementIndex);
-          elementIndex++;
+    // Split content by lines to process headers first
+    const lines = content.split('\n');
+    let currentText = '';
+    let isInCodeBlock = false;
+    let isInMathBlock = false;
+    let blockContent = '';
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      // Check for code block start/end
+      if (line.trim().startsWith('```')) {
+        if (!isInCodeBlock) {
+          if (currentText) {
+            pushInlineMathElement(elements, currentText, messageId, elementIndex++);
+            currentText = '';
+          }
+          isInCodeBlock = true;
+          blockContent = '';
+          continue;
+        } else {
+          isInCodeBlock = false;
+          pushCodeBlockElement(elements, blockContent, messageId, elementIndex++);
+          continue;
         }
       }
-      
-      if (match[1] !== undefined) {
-        // Add block math component
-        const mathContent = match[1].trim();
-        pushBlockMathElement(elements, mathContent, messageId, elementIndex);
-      } else if (match[2] !== undefined) {
-        // Add code block component
-        const codeContent = match[2];
-        pushCodeBlockElement(elements, codeContent, messageId, elementIndex);
+      // Check for math block start/end
+      if (line.trim() === '\\[') {
+        if (!isInMathBlock) {
+          if (currentText) {
+            pushInlineMathElement(elements, currentText, messageId, elementIndex++);
+            currentText = '';
+          }
+          isInMathBlock = true;
+          blockContent = '';
+          continue;
+        }
+      } else if (line.trim() === '\\]' && isInMathBlock) {
+        isInMathBlock = false;
+        pushBlockMathElement(elements, blockContent.trim(), messageId, elementIndex++);
+        continue;
       }
-      
-      elementIndex++;
-      lastIndex = match.index + match[0].length;
+      // Accumulate block content
+      if (isInCodeBlock || isInMathBlock) {
+        blockContent += (blockContent ? '\n' : '') + line;
+        continue;
+      }
+      // Handle headers and regular text
+      if (line.startsWith('### ')) {
+        if (currentText) {
+          pushInlineMathElement(elements, currentText, messageId, elementIndex++);
+          currentText = '';
+        }
+        pushHeadingElement(elements, line.slice(3).trim(), 'h3', messageId, elementIndex++);
+      } else if (line.startsWith('## ')) {
+        if (currentText) {
+          pushInlineMathElement(elements, currentText, messageId, elementIndex++);
+          currentText = '';
+        }
+        pushHeadingElement(elements, line.slice(2).trim(), 'h2', messageId, elementIndex++);
+      } else if (line.startsWith('# ')) {
+        if (currentText) {
+          pushInlineMathElement(elements, currentText, messageId, elementIndex++);
+          currentText = '';
+        }
+        pushHeadingElement(elements, line.slice(1).trim(), 'h1', messageId, elementIndex++);
+      } else {
+        currentText += (currentText ? '\n' : '') + line;
+      }
     }
-    
-    // Handle remaining text and inline math
-    const remainingContent = content.slice(lastIndex);
-    if (remainingContent.length) {
-      pushInlineMathElement(elements, remainingContent, messageId, elementIndex);
+    // Process any remaining text
+    if (currentText) {
+      pushInlineMathElement(elements, currentText, messageId, elementIndex);
     }
     
     return elements;
