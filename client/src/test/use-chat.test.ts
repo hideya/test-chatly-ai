@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 import { useChat } from '../hooks/use-chat';
-import { renderWithProviders } from './test-utils';
+import { createWrapper } from './test-utils';
 import type { Thread, Message } from "@db/schema";
 
 // Mock fetch globally
@@ -14,44 +14,62 @@ describe('useChat Hook', () => {
   });
 
   it('fetches threads on mount', async () => {
+    const mockDate = new Date('2024-12-06T18:10:08.904Z');
     const mockThreads: Thread[] = [
       {
         id: 1,
-        created_at: new Date(),
-        updated_at: new Date()
+        created_at: mockDate,
+        updated_at: mockDate
       }
     ];
 
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: () => Promise.resolve(mockThreads)
-    });
+    mockFetch.mockResolvedValueOnce(
+      new Response(
+        JSON.stringify({
+          ...mockThreads[0],
+          created_at: mockDate.toISOString(),
+          updated_at: mockDate.toISOString(),
+        }),
+        { status: 200, headers: { 'Content-Type': 'application/json' } }
+      )
+    );
 
     const { result } = renderHook(() => useChat(), {
-      wrapper: ({ children }) => renderWithProviders(children)
+      wrapper: createWrapper()
     });
 
     await waitFor(() => {
-      expect(result.current.threads).toEqual(mockThreads);
+      expect(result.current.threads).toEqual([{
+        ...mockThreads[0],
+        created_at: mockDate.toISOString(),
+        updated_at: mockDate.toISOString(),
+      }]);
     });
 
     expect(mockFetch).toHaveBeenCalledWith('/api/threads');
   });
 
   it('creates a new thread', async () => {
+    const mockDate = new Date('2024-12-06T18:10:08.904Z');
     const mockThread: Thread = {
       id: 1,
-      created_at: new Date(),
-      updated_at: new Date()
+      created_at: mockDate,
+      updated_at: mockDate
     };
 
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: () => Promise.resolve(mockThread)
-    });
+    mockFetch.mockResolvedValueOnce(
+      new Response(
+        JSON.stringify({
+          ...mockThread,
+          created_at: mockDate.toISOString(),
+          updated_at: mockDate.toISOString(),
+        }),
+        { status: 200, headers: { 'Content-Type': 'application/json' } }
+      )
+    );
 
     const { result } = renderHook(() => useChat(), {
-      wrapper: ({ children }) => renderWithProviders(children)
+      wrapper: createWrapper()
     });
 
     await result.current.createThread('Hello, ChatGPT!');
@@ -64,22 +82,29 @@ describe('useChat Hook', () => {
   });
 
   it('sends a message to a thread', async () => {
+    const mockDate = new Date('2024-12-06T18:10:08.904Z');
     const mockMessage: Message = {
       id: 1,
       thread_id: 1,
       content: 'Test message',
       role: 'user',
-      created_at: new Date(),
-      updated_at: new Date()
+      created_at: mockDate,
+      updated_at: mockDate
     };
 
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: () => Promise.resolve(mockMessage)
-    });
+    mockFetch.mockResolvedValueOnce(
+      new Response(
+        JSON.stringify({
+          ...mockMessage,
+          created_at: mockDate.toISOString(),
+          updated_at: mockDate.toISOString(),
+        }),
+        { status: 200, headers: { 'Content-Type': 'application/json' } }
+      )
+    );
 
     const { result } = renderHook(() => useChat(), {
-      wrapper: ({ children }) => renderWithProviders(children)
+      wrapper: createWrapper()
     });
 
     await result.current.sendMessage({ threadId: 1, message: 'Test message' });
@@ -92,13 +117,15 @@ describe('useChat Hook', () => {
   });
 
   it('deletes a thread', async () => {
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: () => Promise.resolve({ success: true })
-    });
+    mockFetch.mockResolvedValueOnce(
+      new Response(
+        JSON.stringify({ success: true }),
+        { status: 200, headers: { 'Content-Type': 'application/json' } }
+      )
+    );
 
     const { result } = renderHook(() => useChat(), {
-      wrapper: ({ children }) => renderWithProviders(children)
+      wrapper: createWrapper()
     });
 
     await result.current.deleteThread(1);
@@ -109,14 +136,19 @@ describe('useChat Hook', () => {
   });
 
   it('handles fetch threads error', async () => {
-    mockFetch.mockResolvedValueOnce({
-      ok: false,
-      status: 500,
-      statusText: 'Internal Server Error'
-    });
+    mockFetch.mockResolvedValueOnce(
+      new Response(
+        'Internal Server Error',
+        { 
+          status: 500, 
+          statusText: 'Internal Server Error',
+          headers: { 'Content-Type': 'text/plain' }
+        }
+      )
+    );
 
     const { result } = renderHook(() => useChat(), {
-      wrapper: ({ children }) => renderWithProviders(children)
+      wrapper: createWrapper()
     });
 
     await waitFor(() => {
@@ -125,14 +157,19 @@ describe('useChat Hook', () => {
   });
 
   it('handles message sending error', async () => {
-    mockFetch.mockResolvedValueOnce({
-      ok: false,
-      status: 500,
-      statusText: 'Internal Server Error'
-    });
+    mockFetch.mockResolvedValueOnce(
+      new Response(
+        'Internal Server Error',
+        { 
+          status: 500, 
+          statusText: 'Internal Server Error',
+          headers: { 'Content-Type': 'text/plain' }
+        }
+      )
+    );
 
     const { result } = renderHook(() => useChat(), {
-      wrapper: ({ children }) => renderWithProviders(children)
+      wrapper: createWrapper()
     });
 
     await expect(

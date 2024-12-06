@@ -1,12 +1,13 @@
 import { expect, beforeEach, afterEach, vi } from 'vitest';
 
-// Setup test environment
-import { vi } from 'vitest';
+// Mock database
+vi.mock('@neondatabase/serverless', () => ({
+  neon: () => ({
+    sql: vi.fn(),
+  }),
+}));
 
-// Reset modules before each test
-vi.resetModules();
-
-// Mock OpenAI module
+// Mock OpenAI
 vi.mock('openai', () => ({
   default: vi.fn().mockImplementation(() => ({
     chat: {
@@ -25,6 +26,10 @@ vi.mock('openai', () => ({
     }
   }))
 }));
+
+// Mock environment variables
+process.env.SESSION_SECRET = 'test-secret';
+process.env.DATABASE_URL = 'postgresql://test:test@localhost:5432/test';
 
 beforeEach(() => {
   vi.resetModules();

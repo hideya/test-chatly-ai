@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 import { useUser } from '../hooks/use-user';
-import { renderWithProviders } from './test-utils';
+import { createWrapper } from './test-utils';
 import type { User, InsertUser } from "@db/schema";
 
 // Mock fetch globally
@@ -28,7 +28,7 @@ describe('useUser Hook', () => {
     });
 
     const { result } = renderHook(() => useUser(), {
-      wrapper: ({ children }) => renderWithProviders(children)
+      wrapper: createWrapper()
     });
 
     await waitFor(() => {
@@ -52,7 +52,7 @@ describe('useUser Hook', () => {
     });
 
     const { result } = renderHook(() => useUser(), {
-      wrapper: ({ children }) => renderWithProviders(children)
+      wrapper: createWrapper()
     });
 
     const loginResult = await result.current.login(loginData);
@@ -79,7 +79,7 @@ describe('useUser Hook', () => {
     });
 
     const { result } = renderHook(() => useUser(), {
-      wrapper: ({ children }) => renderWithProviders(children)
+      wrapper: createWrapper()
     });
 
     const loginResult = await result.current.login(loginData);
@@ -97,7 +97,7 @@ describe('useUser Hook', () => {
     });
 
     const { result } = renderHook(() => useUser(), {
-      wrapper: ({ children }) => renderWithProviders(children)
+      wrapper: createWrapper()
     });
 
     const logoutResult = await result.current.logout();
@@ -121,7 +121,7 @@ describe('useUser Hook', () => {
     });
 
     const { result } = renderHook(() => useUser(), {
-      wrapper: ({ children }) => renderWithProviders(children)
+      wrapper: createWrapper()
     });
 
     const registerResult = await result.current.register(registerData);
@@ -143,7 +143,7 @@ describe('useUser Hook', () => {
     });
 
     const { result } = renderHook(() => useUser(), {
-      wrapper: ({ children }) => renderWithProviders(children)
+      wrapper: createWrapper()
     });
 
     const loginResult = await result.current.login({
