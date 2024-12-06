@@ -6,8 +6,8 @@ import ChatInput, { ChatInputHandle } from "./ChatInput";
 import { Loader2 } from "lucide-react";
 import type { Message } from "@db/schema";
 import 'katex/dist/katex.min.css';
-import type { KatexError } from 'katex';
 import { InlineMath, BlockMath } from 'react-katex';
+import type { ParseError } from 'katex';
 
 interface ChatThreadProps {
   threadId: number | null;
@@ -92,46 +92,51 @@ export default function ChatThread({ threadId, onThreadCreated }: ChatThreadProp
   }
 
   const renderInlineMath = (content: string, messageId: number, contentIndex: number): React.ReactNode[] => {
-    const inlineElements: React.ReactNode[] = [];
-    let lastIndex = 0;
-    const inlineRegex = /\\\((.*?)\\\)/g;
-    let match: RegExpExecArray | null;
-    let inlineCount = 0;
+    try {
+      const inlineElements: React.ReactNode[] = [];
+      let lastIndex = 0;
+      const inlineRegex = /\\\((.*?)\\\)/g;
+      let match: RegExpExecArray | null;
+      let inlineCount = 0;
 
-    while ((match = inlineRegex.exec(content)) !== null) {
-      if (match.index > lastIndex) {
+      while ((match = inlineRegex.exec(content)) !== null) {
+        if (match.index > lastIndex) {
+          inlineElements.push(
+            <span key={`text-${messageId}-${contentIndex}-${inlineCount}`}>
+              {content.slice(lastIndex, match.index)}
+            </span>
+          );
+        }
+        
+        const mathContent = (match[1] || '').trim();
+        inlineElements.push(
+          <InlineMath 
+            key={`inline-math-${messageId}-${contentIndex}-${inlineCount}`}
+            math={mathContent}
+            renderError={(error: ParseError) => (
+              <span className="text-destructive">
+                Error rendering math: {error.message}
+              </span>
+            )}
+          />
+        );
+        lastIndex = match.index + match[0].length;
+        inlineCount++;
+      }
+      
+      if (lastIndex < content.length) {
         inlineElements.push(
           <span key={`text-${messageId}-${contentIndex}-${inlineCount}`}>
-            {content.slice(lastIndex, match.index)}
+            {content.slice(lastIndex)}
           </span>
         );
       }
       
-      const mathContent = (match[1] || '').trim();
-      inlineElements.push(
-        <InlineMath 
-          key={`inline-math-${messageId}-${contentIndex}-${inlineCount}`}
-          math={mathContent}
-          renderError={(error: Error) => (
-            <span className="text-destructive">
-              Error rendering math: {error.message}
-            </span>
-          )}
-        />
-      );
-      lastIndex = match.index + match[0].length;
-      inlineCount++;
+      return inlineElements;
+    } catch (error) {
+      console.error('Error rendering inline math:', error);
+      return [<span key="error" className="text-destructive">Error rendering mathematical expression</span>];
     }
-    
-    if (lastIndex < content.length) {
-      inlineElements.push(
-        <span key={`text-${messageId}-${contentIndex}-${inlineCount}`}>
-          {content.slice(lastIndex)}
-        </span>
-      );
-    }
-    
-    return inlineElements;
   };
 
   const renderMessageContent = (content: string, messageId: number) => {
