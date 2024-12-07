@@ -3,8 +3,6 @@
 An AI chat application providing conversational AI capabilities with user authentication and chat management functionality.
 The system implements thread-based conversations with OpenAI integration and responsive UI interactions.
 
-For a detailed list of features, see [FEATURES.md](FEATURES.md)
-
 ## Prerequisites
 
 Before running the application, ensure you have:
@@ -15,10 +13,9 @@ Before running the application, ensure you have:
 ## Environment Setup
 
 1. Create your environment configuration:
-   - Copy the template environment file:
-     ```bash
-     cp .env.template .env
-     ```
+   ```bash
+   cp .env.template .env
+   ```
    - The `.env` file is automatically ignored by Git to prevent accidental commits
    - Update the `.env` file with your credentials:
      - Set your PostgreSQL database URL
@@ -123,48 +120,26 @@ npm run test:coverage
 
 ## Deployment
 
-For deployment instructions on other platforms (Heroku, AWS, Docker), see [DEPLOYMENT.md](DEPLOYMENT.md)
+This application supports deployment on various platforms including Replit, Heroku, AWS, and Docker. For detailed platform-specific deployment instructions, please refer to [DEPLOYMENT.md](DEPLOYMENT.md).
 
-This application can be deployed on Replit following these steps:
+Generic deployment steps:
 
-1. Fork the repository on Replit
-   - Go to [replit.com](https://replit.com)
-   - Click "Create Repl"
-   - Choose "Import from GitHub"
-   - Paste the repository URL
+1. Ensure Prerequisites:
+   - Node.js runtime environment
+   - PostgreSQL database instance
+   - Environment variables configured
 
-2. Set up environment variables:
-   - In your Repl's "Secrets" tab, add the following environment variables:
-     - `DATABASE_URL`: Your PostgreSQL connection string
-     - `OPENAI_API_KEY`: Your OpenAI API key
-     - `PORT`: Set to 5000 (or your preferred port)
-
-3. Install dependencies:
-   ```bash
-   npm install
-   ```
-
-4. Set up the database:
-   ```bash
-   npm run db:push
-   ```
-
-5. Build and start the application:
+2. Build for Production:
    ```bash
    npm run build
+   ```
+
+3. Start the Application:
+   ```bash
    npm start
    ```
 
-The application will be available at your Repl's URL. Replit automatically handles:
-- HTTPS certificates
-- Process management
-- Continuous deployment from Git
-- Domain management
-
-Note: For optimal performance on Replit:
-- Enable "Always On" in your Repl settings for 24/7 availability
-- Use environment variables for sensitive information
-- Configure proper build commands in the `.replit` file
+For platform-specific deployment guides, including Replit, Heroku, AWS, and Docker deployments, see [DEPLOYMENT.md](DEPLOYMENT.md).
 
 ## Technologies Used
 
@@ -183,7 +158,62 @@ Note: For optimal performance on Replit:
   - [Drizzle ORM](https://orm.drizzle.team/) for database management
   - [OpenAI API](https://platform.openai.com/docs/introduction) integration
 
+## Features
 
+### User Authentication & Security
+- **Secure Authentication Flow**
+  - Robust login and registration system
+  - Session-based authentication with secure token management
+  - Password hashing and salting for enhanced security
+  - Protected API endpoints and route guards
+
+### Chat System & Conversation Management
+- **Thread-based Organization**
+  - Hierarchical conversation structure with separate chat threads
+  - Persistent chat history with timestamps
+  - Easy thread management (create, switch, delete)
+  - Real-time message synchronization
+
+- **Intelligent Messaging**
+  - Context-aware conversation handling
+  - Support for rich text formatting and Markdown
+  - LaTeX rendering for mathematical expressions
+  - Message history preservation and retrieval
+
+### OpenAI Integration
+- **Advanced AI Capabilities**
+  - Seamless integration with OpenAI's API
+  - Intelligent response generation with context awareness
+  - Support for various response types and formats
+  - Built-in rate limiting and error handling
+  - Optimized prompt management for better responses
+
+### User Interface & Experience
+- **Modern, Responsive Design**
+  - Clean, intuitive interface built with Tailwind CSS
+  - Fully responsive layout for all screen sizes
+  - Dark/light mode support
+  - Resizable chat panels for customized workspace
+
+- **Interactive Elements**
+  - Real-time loading states and progress indicators
+  - Smooth animations and transitions
+  - Interactive button feedback
+  - Toast notifications for system feedback
+  - Drag-and-drop file support
+
+### Performance & Reliability
+- **Optimized Performance**
+  - Efficient state management with React Query
+  - Lazy loading of chat history
+  - Optimized API calls and caching
+  - Responsive even with large conversation threads
+
+- **Error Handling & Recovery**
+  - Graceful error handling and display
+  - Automatic reconnection attempts
+  - Session persistence across page reloads
+  - Data loss prevention mechanisms
 
 ## License
 

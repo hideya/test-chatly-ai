@@ -9,6 +9,51 @@ This document provides detailed deployment instructions for various platforms. C
   - [Elastic Beanstalk Deployment](#elastic-beanstalk-deployment)
 - [Docker Deployment](#docker-deployment)
 
+## Replit Deployment
+
+### Prerequisites
+- Replit account
+- OpenAI API key
+- PostgreSQL database (provided by Replit)
+
+### Step-by-Step Instructions
+
+1. **Fork the Repository**
+   - Go to [replit.com](https://replit.com)
+   - Click "Create Repl"
+   - Choose "Import from GitHub"
+   - Paste the repository URL
+
+2. **Configure Environment**
+   - In your Repl's "Secrets" tab, add:
+     - `DATABASE_URL`: Your PostgreSQL connection string
+     - `OPENAI_API_KEY`: Your OpenAI API key
+     - `PORT`: Set to 5000 (or preferred port)
+
+3. **Install and Setup**
+   ```bash
+   npm install
+   npm run db:push
+   ```
+
+4. **Build and Deploy**
+   ```bash
+   npm run build
+   npm start
+   ```
+
+### Replit-Specific Features
+Replit automatically handles:
+- HTTPS certificates
+- Process management
+- Continuous deployment from Git
+- Domain management
+
+### Optimization Tips
+- Enable "Always On" in Repl settings for 24/7 availability
+- Use environment variables for sensitive information
+- Configure proper build commands in the `.replit` file
+
 ## Heroku Deployment
 
 ### Prerequisites
