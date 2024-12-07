@@ -10,6 +10,9 @@ This document provides detailed deployment instructions for various platforms. C
   - [EC2 Deployment](#ec2-deployment)
   - [Elastic Beanstalk Deployment](#elastic-beanstalk-deployment)
 - [Docker Deployment](#docker-deployment)
+- [General Maintenance Tips](#general-maintenance-tips)
+- [Deployment Verification Steps](#deployment-verification-steps)
+- [Troubleshooting Common Issues](#troubleshooting-common-issues)
 
 ## Replit Deployment
 
@@ -286,55 +289,166 @@ Before considering a deployment successful, follow these verification steps:
    ```bash
    # Check if the server is running and responding
    curl http://your-domain:5000/health
+   
+   # Verify server process
+   ps aux | grep node
+   
+   # Check server logs
+   tail -f logs/app.log
    ```
-   Expected response: `{"status": "healthy", "timestamp": "..."}`
+   Expected health response: `{"status": "healthy", "timestamp": "...", "version": "1.0.0"}`
 
 2. **Database Connectivity**
    ```bash
-   # The application will automatically verify database connection on startup
-   # Check server logs for successful database connection message
+   # Verify database connection
+   curl http://your-domain:5000/health | grep "healthy"
+   
+   # Check database migrations status
+   npm run db:push -- --dry-run
+   
+   # Test database query performance
+   curl -X GET http://your-domain:5000/api/threads \
+     -H "Authorization: Bearer YOUR_TOKEN" \
+     -w "\nTime: %{time_total}s\n"
    ```
-   Expected log: "Database connection established successfully"
+   Expected: 
+   - Successful connection message in logs
+   - Migrations are up to date
+   - Query response time < 500ms
 
 3. **API Functionality**
    ```bash
-   # Test authentication endpoint
-   curl -X POST http://your-domain:5000/api/auth/login \
+   # Test authentication flow
+   # 1. Register
+   curl -X POST http://your-domain:5000/api/register \
      -H "Content-Type: application/json" \
-     -d '{"email": "test@example.com", "password": "testpassword"}'
+     -d '{"username": "testuser", "password": "testpass"}'
+   
+   # 2. Login
+   curl -X POST http://your-domain:5000/api/login \
+     -H "Content-Type: application/json" \
+     -d '{"username": "testuser", "password": "testpass"}'
+   
+   # 3. Create chat thread
+   curl -X POST http://your-domain:5000/api/threads \
+     -H "Content-Type: application/json" \
+     -H "Cookie: connect.sid=YOUR_SESSION_ID" \
+     -d '{"message": "Hello, AI!"}'
+   
+   # 4. Verify user session
+   curl http://your-domain:5000/api/user \
+     -H "Cookie: connect.sid=YOUR_SESSION_ID"
    ```
-   Expected: JSON response with auth token
+   Expected: Successful responses for all endpoints with appropriate status codes
 
 4. **Environment Variables**
-   - Verify all required environment variables are set:
-     ```bash
-     # Check if environment variables are accessible
-     node -e 'console.log(process.env.DATABASE_URL && "Database URL is set")'
-     node -e 'console.log(process.env.OPENAI_API_KEY && "OpenAI API key is set")'
-     ```
+   ```bash
+   # Verify required environment variables
+   node -e '
+   const required = [
+     "DATABASE_URL",
+     "OPENAI_API_KEY",
+     "PORT",
+     "NODE_ENV"
+   ];
+   required.forEach(key => {
+     if (!process.env[key]) console.error(`Missing ${key}`);
+     else console.log(`${key} is set`);
+   });'
+   
+   # Test OpenAI API key validity
+   curl -X POST http://your-domain:5000/api/threads \
+     -H "Content-Type: application/json" \
+     -H "Cookie: connect.sid=YOUR_SESSION_ID" \
+     -d '{"message": "Test OpenAI integration"}' \
+     -w "\nStatus: %{http_code}\n"
+   ```
 
 5. **Frontend Assets**
-   - Visit the application URL in a browser
-   - Verify static assets are loading (CSS, JavaScript)
-   - Check browser console for any errors
-   - Confirm the React application renders properly
+   ```bash
+   # Verify static assets
+   curl -I http://your-domain:5000/assets/index.js
+   curl -I http://your-domain:5000/assets/index.css
+   
+   # Check for JavaScript errors
+   # In browser console, verify no errors and run:
+   console.log('React version:', React.version);
+   console.log('React Query version:', ReactQuery.version);
+   ```
+   Browser Tests:
+   - Verify dark/light mode switching
+   - Test responsive layout on different screen sizes
+   - Confirm WebSocket connection for real-time updates
+   - Verify LaTeX rendering in chat messages
 
 6. **Security Verification**
-   - Confirm HTTPS is enabled (if applicable)
-   - Verify API endpoints require authentication
-   - Check CORS settings are properly configured
-   - Test rate limiting functionality
+   ```bash
+   # Test CORS configuration
+   curl -X OPTIONS http://your-domain:5000/api/health \
+     -H "Origin: http://example.com" \
+     -H "Access-Control-Request-Method: GET" \
+     -v
+   
+   # Test rate limiting
+   for i in {1..10}; do
+     curl -w "Request $i: %{http_code}\n" \
+       http://your-domain:5000/api/health;
+     sleep 1;
+   done
+   
+   # Test authentication requirements
+   curl http://your-domain:5000/api/threads
+   # Should return 401 Unauthorized
+   ```
+   Additional Checks:
+   - Verify password hashing (check database entries)
+   - Test session timeout configuration
+   - Verify secure headers (X-Frame-Options, CSP, etc.)
+   - Check SSL/TLS configuration if applicable
 
 7. **Performance Check**
-   - Verify response times are within acceptable range
-   - Check memory usage is stable
-   - Monitor CPU utilization
-   - Confirm no memory leaks after extended operation
+   ```bash
+   # Monitor resource usage
+   top -b -n 1 | grep node
+   free -m
+   df -h
+   
+   # Test response times
+   ab -n 100 -c 10 http://your-domain:5000/health/
+   
+   # Monitor WebSocket connections
+   netstat -an | grep :5000 | wc -l
+   ```
+   Performance Targets:
+   - API response time < 200ms (95th percentile)
+   - Memory usage < 512MB
+   - CPU usage < 70%
+   - WebSocket latency < 100ms
+   - Maximum concurrent connections: 1000
 
 8. **Error Handling**
-   - Test error logging configuration
-   - Verify error responses are properly formatted
-   - Confirm application handles common errors gracefully
+   ```bash
+   # Test error responses
+   # Invalid login
+   curl -X POST http://your-domain:5000/api/login \
+     -H "Content-Type: application/json" \
+     -d '{"username": "invalid", "password": "wrong"}'
+   
+   # Invalid thread ID
+   curl http://your-domain:5000/api/threads/999999/messages \
+     -H "Cookie: connect.sid=YOUR_SESSION_ID"
+   
+   # Malformed JSON
+   curl -X POST http://your-domain:5000/api/threads \
+     -H "Content-Type: application/json" \
+     -H "Cookie: connect.sid=YOUR_SESSION_ID" \
+     -d '{invalid json}'
+   ```
+   Expected Error Handling:
+   - Proper HTTP status codes (400, 401, 403, 404, 500)
+   - JSON error responses with clear messages
+   - Error logging to appropriate channels
+   - Rate limit exceeded responses
 
 ### Troubleshooting Common Issues
 
