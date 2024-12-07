@@ -10,9 +10,9 @@ See [docs/FEATURES.md](docs/FEATURES.md) for a detailed list of features.
 - [Environment Setup](#environment-setup)
 - [Building the Application](#building-the-application)
 - [Development](#development)
-- [Project Structure](#project-structure)
 - [Running Unit Tests](#running-unit-tests)
 - [Deployment](#deployment)
+- [Project Structure](#project-structure)
 - [Technologies Used](#technologies-used)
 - [License](#license)
 
@@ -88,22 +88,6 @@ npm run dev
 
 This will start both the frontend and backend servers on port 5000.
 
-## Project Structure
-
-```
-├── client/                # Frontend React application
-│   ├── src/
-│   │   ├── components/   # React components
-│   │   ├── hooks/        # Custom React hooks
-│   │   ├── pages/        # Page components
-│   │   └── types/        # TypeScript type definitions
-├── server/               # Backend Express server
-│   ├── routes.ts        # API routes
-│   ├── auth.ts          # Authentication logic
-│   └── openai.ts        # OpenAI integration
-└── db/                  # Database schemas and migrations
-```
-
 ## Running Unit Tests
 
 The project uses Vitest for both frontend and backend testing. Tests are organized into separate directories for client and server components.
@@ -151,6 +135,22 @@ Generic deployment steps:
    ```bash
    npm start
    ```
+
+## Project Structure
+
+```
+├── client/                # Frontend React application
+│   ├── src/
+│   │   ├── components/   # React components
+│   │   ├── hooks/        # Custom React hooks
+│   │   ├── pages/        # Page components
+│   │   └── types/        # TypeScript type definitions
+├── server/               # Backend Express server
+│   ├── routes.ts        # API routes
+│   ├── auth.ts          # Authentication logic
+│   └── openai.ts        # OpenAI integration
+└── db/                  # Database schemas and migrations
+```
 
 ## Technologies Used
 
