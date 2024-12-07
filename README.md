@@ -150,6 +150,76 @@ This will start both the frontend and backend servers on port 5000.
   - Session persistence across page reloads
   - Data loss prevention mechanisms
 
+
+## Running Unit Tests
+
+The project uses Vitest for both frontend and backend testing. Tests are organized into separate directories for client and server components.
+
+### Frontend Tests
+To run frontend tests:
+```bash
+npm run test:client
+# or run in watch mode
+npm run test:client:watch
+```
+
+### Backend Tests
+To run backend tests:
+```bash
+npm run test:server
+# or run in watch mode
+npm run test:server:watch
+```
+
+### Test Coverage
+To generate test coverage reports:
+```bash
+npm run test:coverage
+```
+
+## Deployment
+
+This application can be deployed on Replit following these steps:
+
+1. Fork the repository on Replit
+   - Go to [replit.com](https://replit.com)
+   - Click "Create Repl"
+   - Choose "Import from GitHub"
+   - Paste the repository URL
+
+2. Set up environment variables:
+   - In your Repl's "Secrets" tab, add the following environment variables:
+     - `DATABASE_URL`: Your PostgreSQL connection string
+     - `OPENAI_API_KEY`: Your OpenAI API key
+     - `PORT`: Set to 5000 (or your preferred port)
+
+3. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+4. Set up the database:
+   ```bash
+   npm run db:push
+   ```
+
+5. Build and start the application:
+   ```bash
+   npm run build
+   npm start
+   ```
+
+The application will be available at your Repl's URL. Replit automatically handles:
+- HTTPS certificates
+- Process management
+- Continuous deployment from Git
+- Domain management
+
+Note: For optimal performance on Replit:
+- Enable "Always On" in your Repl settings for 24/7 availability
+- Use environment variables for sensitive information
+- Configure proper build commands in the `.replit` file
+
 ## Technologies Used
 
 - **Frontend**

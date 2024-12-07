@@ -22,7 +22,7 @@ externalPort = 80
 # Workflow definitions
 
 [workflows]
-runButton = "Project" # Define what happens when Run button is clicked
+runButton = "Project"
 
 [[workflows.workflow]]
 name = "Project"
@@ -44,6 +44,10 @@ args = "Frontend Tests"
 [[workflows.workflow.tasks]]
 task = "workflow.run"
 args = "Backend Tests"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "README Verification"
 
 [[workflows.workflow]]
 name = "Full Stack App"
@@ -104,3 +108,17 @@ task = "packager.installForAll"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "TEST_ENV=server npx vitest --config ./vitest.config.ts --dir ./server/test"
+
+[[workflows.workflow]]
+name = "README Verification"
+author = "agent"
+
+[workflows.workflow.metadata]
+agentRequireRestartOnSave = false
+
+[[workflows.workflow.tasks]]
+task = "packager.installForAll"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cat README.md"
