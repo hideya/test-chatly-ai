@@ -47,7 +47,7 @@ const ChatInput = forwardRef<ChatInputHandle, ChatInputProps>(({ onSubmit, isLoa
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex gap-2">
+    <form onSubmit={handleSubmit} className="flex gap-4">
       <Textarea
         ref={inputRef}
         value={message}
@@ -61,7 +61,7 @@ const ChatInput = forwardRef<ChatInputHandle, ChatInputProps>(({ onSubmit, isLoa
         type="submit"
         size="icon"
         disabled={!message.trim() || isSubmitting || isLoading}
-        className="self-end"
+        className="self-center rounded-full h-12 w-12 transition-transform hover:scale-105"
       >
         {isLoading || isSubmitting ? (
           <Loader2 className="h-4 w-4 animate-spin" />
