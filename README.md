@@ -121,6 +121,8 @@ npm run test:coverage
 
 ## Deployment
 
+For deployment instructions on other platforms (Heroku, AWS, Docker), see [DEPLOYMENT.md](DEPLOYMENT.md)
+
 This application can be deployed on Replit following these steps:
 
 1. Fork the repository on Replit
