@@ -11,17 +11,13 @@ deploymentTarget = "cloudrun"
 build = ["npm", "run", "build"]
 run = ["npm", "run", "start"]
 
-# Port configuration
+[[ports]]
+localPort = 3000
+externalPort = 3000
 
 [[ports]]
-# Frontend development server
-internalPort = 3000 # Vite dev server
-externalPort = 3000 # External access port
-
-[[ports]]
-# Backend server
-internalPort = 5000 # Express server
-externalPort = 80   # Production HTTP port
+localPort = 5000
+externalPort = 80
 
 # Workflow definitions
 
