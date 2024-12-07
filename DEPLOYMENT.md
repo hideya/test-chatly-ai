@@ -3,6 +3,8 @@
 This document provides detailed deployment instructions for various platforms. Choose the platform that best suits your needs.
 
 ## Table of Contents
+- [Prerequisites](#prerequisites)
+- [Replit Deployment](#replit-deployment)
 - [Heroku Deployment](#heroku-deployment)
 - [AWS Deployment](#aws-deployment)
   - [EC2 Deployment](#ec2-deployment)
@@ -275,3 +277,83 @@ services:
    - Implement horizontal scaling when needed
    - Use load balancers for traffic distribution
    - Cache frequently accessed data
+
+## Deployment Verification Steps
+
+Before considering a deployment successful, follow these verification steps:
+
+1. **Server Health Check**
+   ```bash
+   # Check if the server is running and responding
+   curl http://your-domain:5000/health
+   ```
+   Expected response: `{"status": "healthy", "timestamp": "..."}`
+
+2. **Database Connectivity**
+   ```bash
+   # The application will automatically verify database connection on startup
+   # Check server logs for successful database connection message
+   ```
+   Expected log: "Database connection established successfully"
+
+3. **API Functionality**
+   ```bash
+   # Test authentication endpoint
+   curl -X POST http://your-domain:5000/api/auth/login \
+     -H "Content-Type: application/json" \
+     -d '{"email": "test@example.com", "password": "testpassword"}'
+   ```
+   Expected: JSON response with auth token
+
+4. **Environment Variables**
+   - Verify all required environment variables are set:
+     ```bash
+     # Check if environment variables are accessible
+     node -e 'console.log(process.env.DATABASE_URL && "Database URL is set")'
+     node -e 'console.log(process.env.OPENAI_API_KEY && "OpenAI API key is set")'
+     ```
+
+5. **Frontend Assets**
+   - Visit the application URL in a browser
+   - Verify static assets are loading (CSS, JavaScript)
+   - Check browser console for any errors
+   - Confirm the React application renders properly
+
+6. **Security Verification**
+   - Confirm HTTPS is enabled (if applicable)
+   - Verify API endpoints require authentication
+   - Check CORS settings are properly configured
+   - Test rate limiting functionality
+
+7. **Performance Check**
+   - Verify response times are within acceptable range
+   - Check memory usage is stable
+   - Monitor CPU utilization
+   - Confirm no memory leaks after extended operation
+
+8. **Error Handling**
+   - Test error logging configuration
+   - Verify error responses are properly formatted
+   - Confirm application handles common errors gracefully
+
+### Troubleshooting Common Issues
+
+1. **Server Not Starting**
+   - Check port availability: `lsof -i :5000`
+   - Verify Node.js version: `node --version`
+   - Check for process conflicts
+
+2. **Database Connection Failures**
+   - Verify DATABASE_URL format
+   - Check database server is accessible
+   - Confirm database user permissions
+
+3. **Frontend Loading Issues**
+   - Clear browser cache
+   - Check build artifacts in `dist` directory
+   - Verify static file serving configuration
+
+4. **API Errors**
+   - Check API endpoint URLs
+   - Verify request headers and body format
+   - Monitor server logs for detailed error messages

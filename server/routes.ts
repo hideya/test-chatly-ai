@@ -11,6 +11,15 @@ import { generateChatResponse, generateThreadTitle } from "./openai";
 export function registerRoutes(app: Express) {
   setupAuth(app);
 
+  // Health check endpoint for deployment verification
+  app.get("/health", (_req, res) => {
+    res.json({
+      status: "healthy",
+      timestamp: new Date().toISOString(),
+      version: process.env.npm_package_version || "1.0.0"
+    });
+  });
+
   // Authentication routes
   app.post("/api/register", async (req, res, next) => {
     try {

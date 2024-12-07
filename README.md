@@ -120,7 +120,7 @@ npm run test:coverage
 
 ## Deployment
 
-This application supports deployment on various platforms including Replit, Heroku, AWS, and Docker. For detailed platform-specific deployment instructions, please refer to [DEPLOYMENT.md](DEPLOYMENT.md).
+This application supports deployment on various platforms including Replit, Heroku, AWS, and Docker. For detailed platform-specific deployment instructions and comprehensive verification steps, please refer to [DEPLOYMENT.md](DEPLOYMENT.md).
 
 Generic deployment steps:
 
