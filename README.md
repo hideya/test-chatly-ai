@@ -6,8 +6,8 @@ See [docs/FEATURES.md](docs/FEATURES.md) for a detailed list of features.
 
 ## Table of Contents
 - [Prerequisites](#prerequisites)
-- [Environment Setup](#environment-setup)
 - [Installation](#installation)
+- [Environment Setup](#environment-setup)
 - [Building the Application](#building-the-application)
 - [Development](#development)
 - [Project Structure](#project-structure)
@@ -23,6 +23,23 @@ Before running the application, ensure you have:
 - PostgreSQL database
 - OpenAI API key
 
+## Installation
+
+1. Clone the repository:
+   ```bash
+   git clone <repository-url>
+   cd <project-name>
+   ```
+
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+3. Set up the database:
+   ```bash
+   npm run db:push
+   ```
 ## Environment Setup
 
 1. Create your environment configuration:
@@ -45,24 +62,6 @@ Important:
 - Never commit the `.env` file to version control
 - Always use `.env.template` as a reference for required variables
 - Keep your API keys and sensitive credentials secure
-
-## Installation
-
-1. Clone the repository:
-   ```bash
-   git clone <repository-url>
-   cd <project-name>
-   ```
-
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-
-3. Set up the database:
-   ```bash
-   npm run db:push
-   ```
 
 ## Building the Application
 
