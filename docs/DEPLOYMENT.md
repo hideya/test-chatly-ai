@@ -33,10 +33,14 @@ This document provides detailed deployment instructions for various platforms. C
      If any changes are made, revert them, otherwise the deployment may fail.
 
 2. **Configure Environment**
-   - In your Repl's "Secrets" tab, add:
-     - `DATABASE_URL`: Your PostgreSQL connection string
-     - `OPENAI_API_KEY`: Your OpenAI API key
-     - `PORT`: Set to 5000 (or preferred port)
+   - Create PostgreSQL Database for the Repl
+     - Open your Repl's "PostgreSQL" tab under the "Tools" section, click "Create a database"
+     - The DATABASE_URL environment variable will be automatically created
+   - Configure the environment variables
+     - In your Repl's "Secrets" tab, add:
+       - `DATABASE_URL`: Your PostgreSQL connection string (if not already created)
+       - `OPENAI_API_KEY`: Your OpenAI API key
+       - `PORT`: Set to 5000 (or preferred port)
 
 3. **Install and Setup**
    ```bash
