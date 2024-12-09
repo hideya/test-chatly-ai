@@ -57,6 +57,7 @@ Before running the application, ensure you have:
    OPENAI_API_KEY=sk-...         # Your OpenAI API key
    PORT=5001                     # Server port (optional, defaults to 5001)
    ```
+- Note: Port 5001 is used instead of 5000 as macOS uses 5000 for AirPlay Receiver
 
 Important:
 - Never commit the `.env` file to version control
