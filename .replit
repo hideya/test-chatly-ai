@@ -11,12 +11,10 @@ deploymentTarget = "cloudrun"
 build = ["npm", "run", "build"]
 run = ["npm", "run", "start"]
 
-# Ports for React development server
 [[ports]]
 localPort = 3000
 externalPort = 3000
 
-# Ports for Node.js/Express backend API server
 [[ports]]
 localPort = 5001
 externalPort = 80
