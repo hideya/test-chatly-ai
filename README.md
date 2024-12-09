@@ -47,18 +47,18 @@ Before running the application, ensure you have:
      OPENAI_API_KEY=sk-...         # Your OpenAI API key
      PORT=5001                     # Server port (optional, defaults to 5001)
      ```
-   - The file is automatically loaded by the server
-   - The file is automatically ignored by Git to prevent accidental commits of the credentials
+   - The info set in this file is automatically loaded by the server
+   - This file is ignored by Git automatically to prevent accidental commits of the credentials
    - Note: Port 5001 is used instead of 5000 as macOS uses 5000 for AirPlay Receiver
 
 4. Set up the database:
 
-   - First, load the environment variables:
+   - First, set the `DATABASE_URL` environment variable:
      ```bash
-     export $(xargs <.env)
+     export $(grep 'DATABASE_URL' .env | xargs)
      ```
      This is required once before the database configuration.
-     The server will load the `.env` file automatically.
+     While developing, the server will load the `.env` file automatically.
 
    - Then, configure the database:
      ```bash
