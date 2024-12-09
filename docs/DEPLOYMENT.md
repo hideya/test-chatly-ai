@@ -35,7 +35,7 @@ This document provides detailed deployment instructions for various platforms. C
 2. **Configure Environment**
    - Create PostgreSQL Database for the Repl
      - Open your Repl's "PostgreSQL" tab under the "Tools" section, click "Create a database"
-     - The DATABASE_URL environment variable will be automatically created
+     - The DATABASE_URL environment variable will be automatically set
    - Configure the environment variables
      - In your Repl's "Secrets" tab, add:
        - `DATABASE_URL`: Your PostgreSQL connection string (if not already created)
