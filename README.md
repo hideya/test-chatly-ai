@@ -23,7 +23,7 @@ Before running the application, ensure you have:
 - PostgreSQL database
 - OpenAI API key
 
-## Installation
+## Installation and Environment Setup
 
 1. Clone the repository:
    ```bash
@@ -36,43 +36,38 @@ Before running the application, ensure you have:
    npm install
    ```
 
-3. Set up the database:
-   ```bash
-   npm run db:push
-   ```
-## Environment Setup
-
-1. Create your environment configuration:
+3. Set up the environment variables:
    ```bash
    cp .env.template .env
    ```
-   - The `.env` file is automatically ignored by Git to prevent accidental commits
+
    - Update the `.env` file with your credentials:
-     - Set your PostgreSQL database URL
-     - Add your OpenAI API key
+     ```env
+     DATABASE_URL=postgresql://user:password@host:port/database  # Your PostgreSQL connection URL
+     OPENAI_API_KEY=sk-...         # Your OpenAI API key
+     PORT=5001                     # Server port (optional, defaults to 5001)
+     ```
+   - The file is automatically loaded by the server
+   - The file is automatically ignored by Git to prevent accidental commits of the credentials
+   - Note: Port 5001 is used instead of 5000 as macOS uses 5000 for AirPlay Receiver
 
-2. Required environment variables:
-   ```env
-   DATABASE_URL=postgresql://user:password@host:5432/database  # Your PostgreSQL connection URL (default port: 5432)
-   OPENAI_API_KEY=sk-...         # Your OpenAI API key
-   PORT=5001                     # Server port (optional, defaults to 5001)
-   ```
-- Note: Port 5001 is used instead of 5000 as macOS uses 5000 for AirPlay Receiver
+4. Set up the database:
 
-Important:
-- Never commit the `.env` file to version control
-- Always use `.env.template` as a reference for required variables
-- Keep your API keys and sensitive credentials secure
+   - First, load the environment variables:
+     ```bash
+     export $(xargs <.env)
+     ```
+     This is required once before the database configuration.
+     The server will automatically load the `.env` file.
+
+   - Then, configure the database:
+     ```bash
+     npm run db:push
+     ```
 
 ## Building the Application
 
-After installation, load the environment variables:
-
-```bash
-export $(xargs <.env)
-```
-
-Then build the application:
+After installation and environment setup, build the application:
 
 ```bash
 npm run build
