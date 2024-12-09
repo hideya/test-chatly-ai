@@ -17,6 +17,7 @@ localPort = 3000
 externalPort = 3000
 
 # Ports for Node.js/Express backend API server
+# Use 5001 instead of 5000 as macOS uses 5000 for AirPlay Receiver
 [[ports]]
 localPort = 5001
 externalPort = 80
