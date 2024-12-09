@@ -23,7 +23,7 @@ Before running the application, ensure you have:
 - PostgreSQL database
 - OpenAI API key
 
-## Installation and Environment Setup
+## Installation and Setup
 
 1. Clone the repository:
    ```bash
@@ -58,7 +58,7 @@ Before running the application, ensure you have:
      export $(xargs <.env)
      ```
      This is required once before the database configuration.
-     The server will automatically load the `.env` file.
+     The server will load the `.env` file automatically.
 
    - Then, configure the database:
      ```bash
