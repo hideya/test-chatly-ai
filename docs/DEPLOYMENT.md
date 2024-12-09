@@ -40,7 +40,7 @@ This document provides detailed deployment instructions for various platforms. C
      - In your Repl's "Secrets" tab, add:
        - `DATABASE_URL`: Your PostgreSQL connection string (if not already created)
        - `OPENAI_API_KEY`: Your OpenAI API key
-       - `PORT`: Set to 5000 (or preferred port)
+       - `PORT`: Set to 5001 (or preferred port)
 
 3. **Install and Setup**
    ```bash
@@ -126,7 +126,7 @@ Replit automatically handles:
 1. **Launch EC2 Instance**
    - Choose Amazon Linux 2 AMI
    - Select appropriate instance type (t2.micro for testing)
-   - Configure security groups for ports 80, 443, and 5000
+   - Configure security groups for ports 80, 443, and 5001
 
 2. **Connect to Instance**
    ```bash
@@ -216,7 +216,7 @@ Replit automatically handles:
    RUN npm install
    COPY . .
    RUN npm run build
-   EXPOSE 5000
+   EXPOSE 5001
    CMD ["npm", "start"]
    ```
 
@@ -228,12 +228,12 @@ Replit automatically handles:
 3. **Configure Environment**
    Create a `.env` file or pass environment variables:
    ```bash
-   docker run -e OPENAI_API_KEY=your_key -e DATABASE_URL=your_db_url -p 5000:5000 your-app-name
+   docker run -e OPENAI_API_KEY=your_key -e DATABASE_URL=your_db_url -p 5001:5001 your-app-name
    ```
 
 4. **Run Container**
    ```bash
-   docker run -d -p 5000:5000 --name your-app your-app-name
+   docker run -d -p 5001:5001 --name your-app your-app-name
    ```
 
 ### Docker Compose Setup
@@ -243,7 +243,7 @@ services:
   app:
     build: .
     ports:
-      - "5000:5000"
+      - "5001:5001"
     environment:
       - DATABASE_URL=postgresql://user:password@db:5432/dbname
       - OPENAI_API_KEY=your_key
@@ -295,7 +295,7 @@ Before considering a deployment successful, follow these verification steps:
 1. **Server Health Check**
    ```bash
    # Check if the server is running and responding
-   curl http://your-domain:5000/health
+   curl http://your-domain:5001/health
    
    # Verify server process
    ps aux | grep node
@@ -308,13 +308,13 @@ Before considering a deployment successful, follow these verification steps:
 2. **Database Connectivity**
    ```bash
    # Verify database connection
-   curl http://your-domain:5000/health | grep "healthy"
+   curl http://your-domain:5001/health | grep "healthy"
    
    # Check database migrations status
    npm run db:push -- --dry-run
    
    # Test database query performance
-   curl -X GET http://your-domain:5000/api/threads \
+   curl -X GET http://your-domain:5001/api/threads \
      -H "Authorization: Bearer YOUR_TOKEN" \
      -w "\nTime: %{time_total}s\n"
    ```
@@ -327,23 +327,23 @@ Before considering a deployment successful, follow these verification steps:
    ```bash
    # Test authentication flow
    # 1. Register
-   curl -X POST http://your-domain:5000/api/register \
+   curl -X POST http://your-domain:5001/api/register \
      -H "Content-Type: application/json" \
      -d '{"username": "testuser", "password": "testpass"}'
    
    # 2. Login
-   curl -X POST http://your-domain:5000/api/login \
+   curl -X POST http://your-domain:5001/api/login \
      -H "Content-Type: application/json" \
      -d '{"username": "testuser", "password": "testpass"}'
    
    # 3. Create chat thread
-   curl -X POST http://your-domain:5000/api/threads \
+   curl -X POST http://your-domain:5001/api/threads \
      -H "Content-Type: application/json" \
      -H "Cookie: connect.sid=YOUR_SESSION_ID" \
      -d '{"message": "Hello, AI!"}'
    
    # 4. Verify user session
-   curl http://your-domain:5000/api/user \
+   curl http://your-domain:5001/api/user \
      -H "Cookie: connect.sid=YOUR_SESSION_ID"
    ```
    Expected: Successful responses for all endpoints with appropriate status codes
@@ -364,7 +364,7 @@ Before considering a deployment successful, follow these verification steps:
    });'
    
    # Test OpenAI API key validity
-   curl -X POST http://your-domain:5000/api/threads \
+   curl -X POST http://your-domain:5001/api/threads \
      -H "Content-Type: application/json" \
      -H "Cookie: connect.sid=YOUR_SESSION_ID" \
      -d '{"message": "Test OpenAI integration"}' \
@@ -374,8 +374,8 @@ Before considering a deployment successful, follow these verification steps:
 5. **Frontend Assets**
    ```bash
    # Verify static assets
-   curl -I http://your-domain:5000/assets/index.js
-   curl -I http://your-domain:5000/assets/index.css
+   curl -I http://your-domain:5001/assets/index.js
+   curl -I http://your-domain:5001/assets/index.css
    
    # Check for JavaScript errors
    # In browser console, verify no errors and run:
@@ -391,7 +391,7 @@ Before considering a deployment successful, follow these verification steps:
 6. **Security Verification**
    ```bash
    # Test CORS configuration
-   curl -X OPTIONS http://your-domain:5000/api/health \
+   curl -X OPTIONS http://your-domain:5001/api/health \
      -H "Origin: http://example.com" \
      -H "Access-Control-Request-Method: GET" \
      -v
@@ -399,12 +399,12 @@ Before considering a deployment successful, follow these verification steps:
    # Test rate limiting
    for i in {1..10}; do
      curl -w "Request $i: %{http_code}\n" \
-       http://your-domain:5000/api/health;
+       http://your-domain:5001/api/health;
      sleep 1;
    done
    
    # Test authentication requirements
-   curl http://your-domain:5000/api/threads
+   curl http://your-domain:5001/api/threads
    # Should return 401 Unauthorized
    ```
    Additional Checks:
@@ -421,10 +421,10 @@ Before considering a deployment successful, follow these verification steps:
    df -h
    
    # Test response times
-   ab -n 100 -c 10 http://your-domain:5000/health/
+   ab -n 100 -c 10 http://your-domain:5001/health/
    
    # Monitor WebSocket connections
-   netstat -an | grep :5000 | wc -l
+   netstat -an | grep :5001 | wc -l
    ```
    Performance Targets:
    - API response time < 200ms (95th percentile)
@@ -437,16 +437,16 @@ Before considering a deployment successful, follow these verification steps:
    ```bash
    # Test error responses
    # Invalid login
-   curl -X POST http://your-domain:5000/api/login \
+   curl -X POST http://your-domain:5001/api/login \
      -H "Content-Type: application/json" \
      -d '{"username": "invalid", "password": "wrong"}'
    
    # Invalid thread ID
-   curl http://your-domain:5000/api/threads/999999/messages \
+   curl http://your-domain:5001/api/threads/999999/messages \
      -H "Cookie: connect.sid=YOUR_SESSION_ID"
    
    # Malformed JSON
-   curl -X POST http://your-domain:5000/api/threads \
+   curl -X POST http://your-domain:5001/api/threads \
      -H "Content-Type: application/json" \
      -H "Cookie: connect.sid=YOUR_SESSION_ID" \
      -d '{invalid json}'
@@ -460,7 +460,7 @@ Before considering a deployment successful, follow these verification steps:
 ### Troubleshooting Common Issues
 
 1. **Server Not Starting**
-   - Check port availability: `lsof -i :5000`
+   - Check port availability: `lsof -i :5001`
    - Verify Node.js version: `node --version`
    - Check for process conflicts
 

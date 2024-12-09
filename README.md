@@ -55,7 +55,7 @@ Before running the application, ensure you have:
    ```env
    DATABASE_URL=postgresql://user:password@host:5432/database  # Your PostgreSQL connection URL (default port: 5432)
    OPENAI_API_KEY=sk-...         # Your OpenAI API key
-   PORT=5000                     # Server port (optional, defaults to 5000)
+   PORT=5001                     # Server port (optional, defaults to 5001)
    ```
 
 Important:
@@ -65,7 +65,13 @@ Important:
 
 ## Building the Application
 
-After installation, build the application:
+After installation, load the environment variables:
+
+```bash
+export $(xargs <.env)
+```
+
+Then build the application:
 
 ```bash
 npm run build
@@ -86,7 +92,7 @@ To start the development server:
 npm run dev
 ```
 
-This will start both the frontend and backend servers on port 5000.
+This will start both the frontend and backend servers on port 5001.
 
 ## Running Unit Tests
 
