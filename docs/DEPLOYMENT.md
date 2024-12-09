@@ -28,6 +28,9 @@ This document provides detailed deployment instructions for various platforms. C
    - Click "Create Repl"
    - Choose "Import from GitHub"
    - Paste the repository URL
+   - Click "Create Repl"
+   - When creating the Repl, ignore the changes to `.replit` file suggested in "Configure your Repl".
+     If any changes are made, revert them, otherwise the deployment may fail.
 
 2. **Configure Environment**
    - In your Repl's "Secrets" tab, add:
