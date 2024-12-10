@@ -33,7 +33,7 @@ This document provides detailed deployment instructions for various platforms. C
      If any changes are made, revert them, otherwise the deployment may fail.
 
 2. **Configure Environment**
-   - Create PostgreSQL Database for the Repl
+   - Create a Neon PostgreSQL database for the Repl
      - Open your Repl's "PostgreSQL" tab under the "Tools" section, click "Create a database"
      - The DATABASE_URL environment variable will be automatically set
    - Configure the environment variables
