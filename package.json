@@ -8,6 +8,9 @@
     "build": "source .env && vite build && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist",
     "start": "source .env && NODE_ENV=production node dist/index.js",
     "check": "tsc",
+    "dev-replit": "tsx watch --clear-screen=false server/index.ts",
+    "build-replit": "vite build && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist",
+    "start-replit": "NODE_ENV=production node dist/index.js",
     "db:push": "source .env && drizzle-kit push",
     "env:check": "source .env && echo DATABASE_URL=$DATABASE_URL && echo OPENAI_API_KEY=$OPENAI_API_KEY && echo PORT=$PORT"
   },

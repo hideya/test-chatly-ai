@@ -8,8 +8,8 @@ channel = "stable-24_05"
 
 [deployment]
 deploymentTarget = "cloudrun"
-build = ["npm", "run", "build"]
-run = ["npm", "run", "start"]
+build = ["npm", "run", "build-replit"]
+run = ["npm", "run", "start-replit"]
 
 [[ports]]
 localPort = 3000
@@ -65,7 +65,7 @@ task = "packager.installForAll"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "npm run dev"
+args = "npm run dev-replit"
 waitForPort = 5001
 
 [[workflows.workflow]]
@@ -80,7 +80,7 @@ task = "packager.installForAll"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "cd client && npm install && npm run dev"
+args = "cd client && npm install && npm run dev-replit"
 waitForPort = 3000
 
 # Test configuration
