@@ -19,7 +19,7 @@ This document provides detailed deployment instructions for various platforms. C
 ### Prerequisites
 - Replit account
 - OpenAI API key
-- PostgreSQL database (provided by Replit)
+- Neon PostgreSQL database (provided by Replit platform)
 
 ### Step-by-Step Instructions
 
@@ -60,11 +60,6 @@ Replit automatically handles:
 - Process management
 - Continuous deployment from Git
 - Domain management
-
-### Optimization Tips
-- Enable "Always On" in Repl settings for 24/7 availability
-- Use environment variables for sensitive information
-- Configure proper build commands in the `.replit` file
 
 ## Heroku Deployment
 
