@@ -61,7 +61,7 @@ const ChatInput = forwardRef<ChatInputHandle, ChatInputProps>(({ onSubmit, isLoa
         type="submit"
         size="icon"
         disabled={!message.trim() || isSubmitting || isLoading}
-        className="self-center rounded-full h-12 w-12 transition-transform hover:scale-105"
+        className="self-center rounded-full h-10 w-11 transition-transform hover:scale-110"
       >
         {isLoading || isSubmitting ? (
           <Loader2 className="h-4 w-4 animate-spin" />
