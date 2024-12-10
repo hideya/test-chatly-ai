@@ -14,6 +14,11 @@ function log(message: string) {
   console.log(`${formattedTime} [express] ${message}`);
 }
 
+log("Starting server with the following environment variables:");
+log(`\tDATABASE_URL: ${process.env.DATABASE_URL}`);
+log(`\tOPENAI_API_KEY: ${process.env.OPENAI_API_KEY}`);
+log(`\tPORT: ${process.env.PORT}`);
+
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -69,9 +74,9 @@ app.use((req, res, next) => {
     serveStatic(app);
   }
 
-  // Get port from environment variable or fallback to 5000
+  // Get port from environment variable or fallback to 5001
   // this serves both the API and the client
-  const PORT = process.env.PORT ? parseInt(process.env.PORT) : 5000;
+  const PORT = process.env.PORT ? parseInt(process.env.PORT) : 5001;
   server.listen(PORT, "0.0.0.0", () => {
     log(`serving on port ${PORT}`);
   });
