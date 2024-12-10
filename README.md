@@ -20,9 +20,9 @@ See [docs/FEATURES.md](docs/FEATURES.md) for a detailed list of features.
 
 Before running the application, ensure you have:
 - Node.js (v18 or later)
-- PostgreSQL database
-- OpenAI API key
-
+- OpenAI API key ([get one here](https://platform.openai.com/api-keys))
+- Access to a PostgreSQL database hosted on [Neon](https://neon.tech) (free account is sufficient)
+ 
 ## Installation and Setup
 
 1. Clone the repository:
@@ -43,42 +43,27 @@ Before running the application, ensure you have:
 
    - Update the `.env` file with your credentials:
      ```env
-     DATABASE_URL=postgresql://user:password@host:port/database  # Your PostgreSQL connection URL
-     OPENAI_API_KEY=sk-...         # Your OpenAI API key
-     PORT=5001                     # Server port (optional, defaults to 5001)
+     # Your Neon PostgreSQL connection URL
+     DATABASE_URL=postgresql://user:password@host:port/database
+
+     # Your OpenAI API key
+     OPENAI_API_KEY=sk-...
+     
+     # Server port (optional, defaults to 5001)
+     PORT=5001
      ```
-   - The info set in this file is automatically loaded by the server
-   - This file is ignored by Git automatically to prevent accidental commits of the credentials
-   - Note: Port 5001 is used instead of 5000 as macOS uses 5000 for AirPlay Receiver
+     The `DATABASE_URL` is the connection URL to a fresh PostgreSQL database served by Neon.
+     The URL can be found in project's Quickstart tab after creation of a new project on Neon.
+
+   - This file is read by the npm targets defined in [package.json](./package.json) by `source .env`
+      instead of `dotenv` for some technical reasons
+   - `.gitignore` is configured to ignore this file to prevent accidental commits of the credentials
+   - As to the server port, $5001$ is used instead of $5000$, which is used by macOS for AirPlay Receiver
 
 4. Set up the database:
-
-   - First, set the `DATABASE_URL` environment variable:
-     ```bash
-     export $(grep 'DATABASE_URL' .env | xargs)
-     ```
-     This is required once before the database configuration.
-     While developing, the server will load the `.env` file automatically.
-
-   - Then, configure the database:
-     ```bash
-     npm run db:push
-     ```
-
-## Building the Application
-
-After installation and environment setup, build the application:
-
-```bash
-npm run build
-```
-
-This command will:
-- Build the frontend React application
-- Compile the backend TypeScript code
-- Prepare the application for production deployment
-
-The build artifacts will be created in the `dist` directory.
+   ```bash
+   npm run db:push
+   ```
 
 ## Development
 
@@ -88,7 +73,8 @@ To start the development server:
 npm run dev
 ```
 
-This will start both the frontend and backend servers on port 5001.
+This will start both the frontend and backend servers on port $5001$.
+Hot Module Replacement (HMR) is enabled for both frontend and backend.
 
 ## Running Unit Tests
 
@@ -123,10 +109,7 @@ For detailed platform-specific deployment instructions and comprehensive verific
 
 Generic deployment steps:
 
-1. Ensure Prerequisites:
-   - Node.js runtime environment
-   - PostgreSQL database instance
-   - Environment variables configured
+1. Ensure [Prerequisites](#prerequisites)
 
 2. Build for Production:
    ```bash

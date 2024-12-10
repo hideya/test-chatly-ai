@@ -2,15 +2,7 @@ import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic } from "./vite";
 import { createServer } from "http";
-import * as dotenv from 'dotenv';
-import path from 'path';
 
-// Load environment variables from .env file if it exists
-dotenv.config({
-  path: path.resolve(process.cwd(), '.env')
-});
-// Use the existing logging function to show that env vars were loaded
-log('Environment variables loaded');
 function log(message: string) {
   const formattedTime = new Date().toLocaleTimeString("en-US", {
     hour: "2-digit",
@@ -21,6 +13,11 @@ function log(message: string) {
 
   console.log(`${formattedTime} [express] ${message}`);
 }
+
+log("Starting server with the following environment variables:");
+log(`\tDATABASE_URL: ${process.env.DATABASE_URL}`);
+log(`\tOPENAI_API_KEY: ${process.env.OPENAI_API_KEY}`);
+log(`\tPORT: ${process.env.PORT}`);
 
 const app = express();
 app.use(express.json());
