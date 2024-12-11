@@ -43,11 +43,12 @@ export default function ChatThread({ threadId, onThreadCreated }: ChatThreadProp
   };
 
   const scrollAreaRef = useRef<HTMLDivElement>(null);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesAreaRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const scrollToBottom = () => {
-      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+      messagesAreaRef.current?.scrollIntoView({ behavior: 'instant', block: 'start' });
+      messagesAreaRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
     };
 
     scrollToBottom();
@@ -60,10 +61,7 @@ export default function ChatThread({ threadId, onThreadCreated }: ChatThreadProp
 
   useEffect(() => {
     if (threadId !== null && !isLoadingMessages) {
-      // Small delay to ensure DOM is updated
-      setTimeout(() => {
-        chatInputRef.current?.focus();
-      }, 0);
+      chatInputRef.current?.focus();
     }
   }, [threadId, isLoadingMessages]);
 
@@ -305,7 +303,7 @@ export default function ChatThread({ threadId, onThreadCreated }: ChatThreadProp
   return (
     <div className="h-full flex flex-col">
       <ScrollArea className="flex-1 p-4" ref={scrollAreaRef}>
-        <div className="max-w-3xl mx-auto space-y-4">
+        <div className="max-w-3xl mx-auto space-y-4" ref={messagesAreaRef}>
           {messages.map((message) => (
             <div
               key={`message-${message.id}`}
@@ -331,7 +329,6 @@ export default function ChatThread({ threadId, onThreadCreated }: ChatThreadProp
               </div>
             </div>
           )}
-          <div ref={messagesEndRef} />
         </div>
       </ScrollArea>
       <div className="p-4 border-t input-area">
