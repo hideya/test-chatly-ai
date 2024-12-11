@@ -42,28 +42,36 @@ export default function ChatThread({ threadId, onThreadCreated }: ChatThreadProp
     }
   };
 
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     const scrollToBottom = () => {
-      const scrollArea = document.querySelector("[data-radix-scroll-area-viewport]");
-      if (scrollArea) {
-        scrollArea.scrollTop = scrollArea.scrollHeight;
+      if (scrollAreaRef.current) {
+        scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight;
       }
     };
 
-    // Call immediately
+    // Call immediately and after a delay to handle both initial and dynamic content
     scrollToBottom();
     
-    // And after a short delay to ensure content is rendered
-    const timeoutId = setTimeout(scrollToBottom, 100);
+    // Use RAF for smoother scrolling after content renders
+    const rafId = requestAnimationFrame(() => {
+      scrollToBottom();
+      
+      // Additional check after a longer delay for images or heavy content
+      setTimeout(scrollToBottom, 300);
+    });
     
-    // Keep the focus behavior for AI responses
+    // Handle AI response focus
     if (messages.length > 0 && messages[messages.length - 1].role === "assistant") {
-      setTimeout(() => {
+      requestAnimationFrame(() => {
         chatInputRef.current?.focus();
-      }, 100);
+      });
     }
     
-    return () => clearTimeout(timeoutId);
+    return () => {
+      cancelAnimationFrame(rafId);
+    };
   }, [messages]);
 
   useEffect(() => {
@@ -312,7 +320,7 @@ export default function ChatThread({ threadId, onThreadCreated }: ChatThreadProp
 
   return (
     <div className="h-full flex flex-col">
-      <ScrollArea className="flex-1 p-4">
+      <ScrollArea className="flex-1 p-4" ref={scrollAreaRef}>
         <div className="max-w-3xl mx-auto space-y-4">
           {messages.map((message) => (
             <div
