@@ -43,35 +43,19 @@ export default function ChatThread({ threadId, onThreadCreated }: ChatThreadProp
   };
 
   const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const scrollToBottom = () => {
-      if (scrollAreaRef.current) {
-        scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight;
-      }
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     };
 
-    // Call immediately and after a delay to handle both initial and dynamic content
     scrollToBottom();
-    
-    // Use RAF for smoother scrolling after content renders
-    const rafId = requestAnimationFrame(() => {
-      scrollToBottom();
-      
-      // Additional check after a longer delay for images or heavy content
-      setTimeout(scrollToBottom, 300);
-    });
     
     // Handle AI response focus
     if (messages.length > 0 && messages[messages.length - 1].role === "assistant") {
-      requestAnimationFrame(() => {
-        chatInputRef.current?.focus();
-      });
+      chatInputRef.current?.focus();
     }
-    
-    return () => {
-      cancelAnimationFrame(rafId);
-    };
   }, [messages]);
 
   useEffect(() => {
@@ -347,6 +331,7 @@ export default function ChatThread({ threadId, onThreadCreated }: ChatThreadProp
               </div>
             </div>
           )}
+          <div ref={messagesEndRef} />
         </div>
       </ScrollArea>
       <div className="p-4 border-t input-area">
