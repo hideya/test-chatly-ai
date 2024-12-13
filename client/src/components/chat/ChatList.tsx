@@ -53,8 +53,9 @@ export default function ChatList({
                 data-[state=deleting]:animate-out data-[state=deleting]:fade-out-0 data-[state=deleting]:slide-out-to-left
               `}
               data-state={deletingThreadId === thread.id ? "deleting" : "active"}
-              onClick={(e) => {
-                e.stopPropagation();
+              onClick={() => onSelectThread(thread.id)}
+              onTouchEnd={(e) => {
+                e.preventDefault();
                 onSelectThread(thread.id);
               }}
             >
