@@ -35,7 +35,7 @@ export default function ChatPage() {
       </header>
 
       <ResizablePanelGroup direction="horizontal" className="flex-1">
-        <ResizablePanel defaultSize={25} minSize={20} maxSize={40}>
+        <ResizablePanel defaultSize={30} minSize={25} maxSize={45}>
           <ChatList
             threads={threads}
             selectedThreadId={selectedThreadId}
