@@ -42,7 +42,7 @@ export default function ChatPage() {
         </div>
       </header>
 
-      <ResizablePanelGroup direction="horizontal" className="flex-1">
+      <ResizablePanelGroup direction="horizontal" className="flex-1" style={{ direction: 'rtl' }}>
         {(!isMobile || showMobileMenu) && (
           <>
             <ResizablePanel 
