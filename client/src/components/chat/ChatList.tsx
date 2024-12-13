@@ -32,8 +32,8 @@ export default function ChatList({
   const [deletingThreadId, setDeletingThreadId] = useState<number | null>(null);
 
   return (
-    <div className="h-full flex flex-col overflow-x-auto">
-      <div className="p-4 min-w-[200px]">
+    <div className="h-full flex flex-col">
+      <div className="p-4 min-w-[200px] overflow-x-auto whitespace-nowrap">
         <Button
           onClick={() => onSelectThread(0)}
           className="w-full"
@@ -55,8 +55,8 @@ export default function ChatList({
               data-state={deletingThreadId === thread.id ? "deleting" : "active"}
               onClick={() => onSelectThread(thread.id)}
             >
-              <div className="truncate flex-1">
-                <h3 className="text-sm font-medium truncate">{thread.title}</h3>
+              <div className="truncate flex-1 min-w-0">
+                <h3 className="text-sm font-medium truncate max-w-full">{thread.title}</h3>
                 <p className="text-xs text-muted-foreground">
                   {formatDistanceToNow(new Date(thread.createdAt), {
                     addSuffix: true,
