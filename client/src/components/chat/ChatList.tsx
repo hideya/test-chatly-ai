@@ -32,8 +32,8 @@ export default function ChatList({
   const [deletingThreadId, setDeletingThreadId] = useState<number | null>(null);
 
   return (
-    <div className="h-full flex flex-col">
-      <div className="p-4">
+    <div className="h-full flex flex-col overflow-x-auto">
+      <div className="p-4 min-w-[200px]">
         <Button
           onClick={() => onSelectThread(0)}
           className="w-full"
