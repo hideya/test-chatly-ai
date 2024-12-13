@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useChat } from "../hooks/use-chat";
 import { useUser } from "../hooks/use-user";
+import { useIsMobile } from "../hooks/use-mobile";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import ChatList from "../components/chat/ChatList";
