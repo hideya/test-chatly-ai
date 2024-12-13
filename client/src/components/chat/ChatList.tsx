@@ -53,7 +53,10 @@ export default function ChatList({
                 data-[state=deleting]:animate-out data-[state=deleting]:fade-out-0 data-[state=deleting]:slide-out-to-left
               `}
               data-state={deletingThreadId === thread.id ? "deleting" : "active"}
-              onClick={() => onSelectThread(thread.id)}
+              onClick={(e) => {
+                e.stopPropagation();
+                onSelectThread(thread.id);
+              }}
             >
               <div className="truncate flex-1">
                 <h3 className="text-sm font-medium truncate">{thread.title}</h3>
