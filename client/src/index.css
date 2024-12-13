@@ -17,6 +17,7 @@
   #root {
     height: 100svh;
     overflow: hidden;
+    min-width: 320px;
   }
 }
 
