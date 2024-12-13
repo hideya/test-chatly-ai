@@ -49,7 +49,11 @@ export default function ChatPage() {
               defaultSize={30} 
               minSize={25} 
               maxSize={45}
-              className={`${isMobile ? 'absolute inset-y-0 left-0 z-50 w-3/4 bg-background shadow-lg transition-transform duration-200 ease-in-out' : ''} ${
+              className={`${
+                isMobile 
+                  ? 'fixed inset-y-0 left-0 z-50 w-3/4 bg-background shadow-lg transition-transform duration-700 ease-[cubic-bezier(0.4,0,0.2,1)] transform' 
+                  : ''
+              } ${
                 isMobile && !showMobileMenu ? '-translate-x-full' : 'translate-x-0'
               }`}
             >
