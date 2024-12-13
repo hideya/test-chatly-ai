@@ -51,14 +51,12 @@ export default function ChatPage() {
               maxSize={45}
               className={`${
                 isMobile 
-                  ? 'fixed inset-y-0 left-0 z-50 w-3/4 bg-background shadow-lg transition-transform ease-in-out duration-300' 
+                  ? 'fixed inset-y-0 left-0 z-50 w-3/4 bg-background shadow-lg transition-all transform duration-500' 
                   : ''
               } ${
-                isMobile && !showMobileMenu ? '-translate-x-full' : 'translate-x-0'
+                isMobile && !showMobileMenu ? '-translate-x-full opacity-0' : 'translate-x-0 opacity-100'
               }`}
             >
-              <div className={`${isMobile ? 'absolute inset-0 bg-black/50 -z-10' : 'hidden'}`} 
-                onClick={() => setShowMobileMenu(false)} />
               <ChatList
                 threads={threads}
                 selectedThreadId={selectedThreadId}
