@@ -44,6 +44,41 @@ export default function ChatThread({ threadId, onThreadCreated }: ChatThreadProp
 
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const messagesAreaRef = useRef<HTMLDivElement>(null);
+  const [isScrolling, setIsScrolling] = useState(false);
+  let scrollTimeout: NodeJS.Timeout;
+
+  const handleTouchStart = () => {
+    setIsScrolling(false);
+  };
+
+  const handleTouchMove = () => {
+    setIsScrolling(true);
+    clearTimeout(scrollTimeout);
+  };
+
+  const handleTouchEnd = () => {
+    clearTimeout(scrollTimeout);
+    scrollTimeout = setTimeout(() => {
+      setIsScrolling(false);
+    }, 100);
+  };
+
+  useEffect(() => {
+    const scrollArea = scrollAreaRef.current;
+    if (scrollArea) {
+      scrollArea.addEventListener('touchstart', handleTouchStart);
+      scrollArea.addEventListener('touchmove', handleTouchMove);
+      scrollArea.addEventListener('touchend', handleTouchEnd);
+    }
+    return () => {
+      if (scrollArea) {
+        scrollArea.removeEventListener('touchstart', handleTouchStart);
+        scrollArea.removeEventListener('touchmove', handleTouchMove);
+        scrollArea.removeEventListener('touchend', handleTouchEnd);
+      }
+      clearTimeout(scrollTimeout);
+    };
+  }, []);
 
   useEffect(() => {
     const scrollToBottom = () => {
@@ -302,7 +337,7 @@ export default function ChatThread({ threadId, onThreadCreated }: ChatThreadProp
 
   return (
     <div className="h-full flex flex-col">
-      <ScrollArea className="flex-1 p-4" ref={scrollAreaRef}>
+      <ScrollArea className="flex-1 p-4" ref={scrollAreaRef} data-scrolling={isScrolling}>
         <div className="max-w-3xl mx-auto space-y-4" ref={messagesAreaRef}>
           {messages.map((message) => (
             <div
