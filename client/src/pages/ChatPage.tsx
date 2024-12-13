@@ -51,10 +51,10 @@ export default function ChatPage() {
               maxSize={45}
               className={`${
                 isMobile 
-                  ? 'fixed inset-y-0 left-0 z-50 w-3/4 bg-background shadow-lg transition-transform duration-700 ease-[cubic-bezier(0.4,0,0.2,1)] transform' 
+                  ? 'fixed inset-y-0 left-0 z-50 w-3/4 bg-background shadow-lg transition-all transform duration-500' 
                   : ''
               } ${
-                isMobile && !showMobileMenu ? '-translate-x-full' : 'translate-x-0'
+                isMobile && !showMobileMenu ? '-translate-x-full opacity-0' : 'translate-x-0 opacity-100'
               }`}
             >
               <ChatList
