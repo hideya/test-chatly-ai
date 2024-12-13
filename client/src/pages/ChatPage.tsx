@@ -24,7 +24,7 @@ export default function ChatPage() {
   }
 
   return (
-    <div className="h-screen flex flex-col">
+    <div className="h-[100svh] flex flex-col">
       <header className="border-b px-6 py-3 flex justify-between items-center">
         {isMobile && (
           <Button variant="ghost" size="icon" onClick={() => setShowMobileMenu(!showMobileMenu)}>
