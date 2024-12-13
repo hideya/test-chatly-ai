@@ -55,7 +55,7 @@ Before running the application, ensure you have:
      The `DATABASE_URL` is the connection URL to a fresh PostgreSQL database served by Neon.
      The URL can be found in project's Quickstart tab after creation of a new project on Neon.
 
-   - This file is read by the npm targets defined in [package.json](./package.json) by `source .env`
+   - This file is read via the npm scripts defined in [package.json](./package.json)
       instead of `dotenv` for some technical reasons
    - `.gitignore` is configured to ignore this file to prevent accidental commits of the credentials
    - As to the server port, $5001$ is used instead of $5000$, which is used by macOS for AirPlay Receiver
