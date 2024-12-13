@@ -54,6 +54,13 @@ export default function ChatList({
               `}
               data-state={deletingThreadId === thread.id ? "deleting" : "active"}
               onClick={() => onSelectThread(thread.id)}
+              onTouchEnd={(e) => {
+                if ((e.target as HTMLElement).closest('[data-scrolling="true"]')) {
+                  return;
+                }
+                e.preventDefault();
+                onSelectThread(thread.id);
+              }}
             >
               <div className="truncate flex-1">
                 <h3 className="text-sm font-medium truncate">{thread.title}</h3>

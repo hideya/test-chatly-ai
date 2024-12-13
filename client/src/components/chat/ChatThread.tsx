@@ -42,36 +42,61 @@ export default function ChatThread({ threadId, onThreadCreated }: ChatThreadProp
     }
   };
 
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const messagesAreaRef = useRef<HTMLDivElement>(null);
+  const [isScrolling, setIsScrolling] = useState(false);
+  let scrollTimeout: NodeJS.Timeout;
+
+  const handleTouchStart = () => {
+    setIsScrolling(false);
+  };
+
+  const handleTouchMove = () => {
+    setIsScrolling(true);
+    clearTimeout(scrollTimeout);
+  };
+
+  const handleTouchEnd = () => {
+    clearTimeout(scrollTimeout);
+    scrollTimeout = setTimeout(() => {
+      setIsScrolling(false);
+    }, 100);
+  };
+
+  useEffect(() => {
+    const scrollArea = scrollAreaRef.current;
+    if (scrollArea) {
+      scrollArea.addEventListener('touchstart', handleTouchStart);
+      scrollArea.addEventListener('touchmove', handleTouchMove);
+      scrollArea.addEventListener('touchend', handleTouchEnd);
+    }
+    return () => {
+      if (scrollArea) {
+        scrollArea.removeEventListener('touchstart', handleTouchStart);
+        scrollArea.removeEventListener('touchmove', handleTouchMove);
+        scrollArea.removeEventListener('touchend', handleTouchEnd);
+      }
+      clearTimeout(scrollTimeout);
+    };
+  }, []);
+
   useEffect(() => {
     const scrollToBottom = () => {
-      const scrollArea = document.querySelector("[data-radix-scroll-area-viewport]");
-      if (scrollArea) {
-        scrollArea.scrollTop = scrollArea.scrollHeight;
-      }
+      messagesAreaRef.current?.scrollIntoView({ behavior: 'instant', block: 'start' });
+      messagesAreaRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
     };
 
-    // Call immediately
     scrollToBottom();
     
-    // And after a short delay to ensure content is rendered
-    const timeoutId = setTimeout(scrollToBottom, 100);
-    
-    // Keep the focus behavior for AI responses
+    // Handle AI response focus
     if (messages.length > 0 && messages[messages.length - 1].role === "assistant") {
-      setTimeout(() => {
-        chatInputRef.current?.focus();
-      }, 100);
+      chatInputRef.current?.focus();
     }
-    
-    return () => clearTimeout(timeoutId);
   }, [messages]);
 
   useEffect(() => {
     if (threadId !== null && !isLoadingMessages) {
-      // Small delay to ensure DOM is updated
-      setTimeout(() => {
-        chatInputRef.current?.focus();
-      }, 0);
+      chatInputRef.current?.focus();
     }
   }, [threadId, isLoadingMessages]);
 
@@ -312,8 +337,8 @@ export default function ChatThread({ threadId, onThreadCreated }: ChatThreadProp
 
   return (
     <div className="h-full flex flex-col">
-      <ScrollArea className="flex-1 p-4">
-        <div className="max-w-3xl mx-auto space-y-4">
+      <ScrollArea className="flex-1 p-4" ref={scrollAreaRef} data-scrolling={isScrolling}>
+        <div className="max-w-3xl mx-auto space-y-4" ref={messagesAreaRef}>
           {messages.map((message) => (
             <div
               key={`message-${message.id}`}

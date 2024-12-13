@@ -4,15 +4,15 @@
   "type": "module",
   "license": "MIT",
   "scripts": {
-    "dev": "source .env && tsx watch --clear-screen=false server/index.ts",
-    "build": "source .env && vite build && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist",
-    "start": "source .env && NODE_ENV=production node dist/index.js",
+    "dev": "export $(grep -v '^#' .env | xargs) && tsx watch --clear-screen=false server/index.ts",
+    "build": "export $(grep -v '^#' .env | xargs) && vite build && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist",
+    "start": "export $(grep -v '^#' .env | xargs) && NODE_ENV=production node dist/index.js",
     "check": "tsc",
     "dev-replit": "tsx watch --clear-screen=false server/index.ts",
     "build-replit": "vite build && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist",
     "start-replit": "NODE_ENV=production node dist/index.js",
-    "db:push": "source .env && drizzle-kit push",
-    "env:check": "source .env && echo DATABASE_URL=$DATABASE_URL && echo OPENAI_API_KEY=$OPENAI_API_KEY && echo PORT=$PORT"
+    "db:push": "export $(grep -v '^#' .env | xargs) && drizzle-kit push",
+    "env:check": "export $(grep -v '^#' .env | xargs) && echo DATABASE_URL=$DATABASE_URL && echo OPENAI_API_KEY=$OPENAI_API_KEY && echo PORT=$PORT"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",
