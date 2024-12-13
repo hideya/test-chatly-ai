@@ -69,7 +69,13 @@ export default function ChatPage() {
             {!isMobile && <ResizableHandle />}
           </>
         )}
-        <ResizablePanel defaultSize={75}>
+        <ResizablePanel defaultSize={75} className="relative">
+          {isMobile && showMobileMenu && (
+            <div 
+              className="absolute inset-0 bg-black/30 z-40 transition-opacity duration-300"
+              onClick={() => setShowMobileMenu(false)}
+            />
+          )}
           <ChatThread
             threadId={selectedThreadId}
             onThreadCreated={(id) => setSelectedThreadId(id)}
