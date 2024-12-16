@@ -139,4 +139,4 @@ task = "packager.installForAll"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "ls -l README.md DEPLOYMENT.md && echo '=== README.md ===' && cat README.md && echo '=== DEPLOYMENT.md ===' && cat DEPLOYMENT.md"
+args = "ls -l README.md && echo '=== README.md ===' && cat README.md"
