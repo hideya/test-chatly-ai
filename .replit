@@ -19,8 +19,6 @@ externalPort = 3000
 localPort = 5001
 externalPort = 80
 
-# Workflow definitions
-
 [workflows]
 runButton = "Project"
 
@@ -44,14 +42,6 @@ args = "Frontend Tests"
 [[workflows.workflow.tasks]]
 task = "workflow.run"
 args = "Backend Tests"
-
-[[workflows.workflow.tasks]]
-task = "workflow.run"
-args = "README Verification"
-
-[[workflows.workflow.tasks]]
-task = "workflow.run"
-args = "Doc Verification"
 
 [[workflows.workflow]]
 name = "Full Stack App"
@@ -83,8 +73,6 @@ task = "shell.exec"
 args = "cd client && npm install && npm run dev-replit"
 waitForPort = 3000
 
-# Test configuration
-
 [[workflows.workflow]]
 name = "Frontend Tests"
 author = "agent"
@@ -112,31 +100,3 @@ task = "packager.installForAll"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "TEST_ENV=server npx vitest --config ./vitest.config.ts --dir ./server/test"
-
-[[workflows.workflow]]
-name = "README Verification"
-author = "agent"
-
-[workflows.workflow.metadata]
-agentRequireRestartOnSave = false
-
-[[workflows.workflow.tasks]]
-task = "packager.installForAll"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "cat README.md"
-
-[[workflows.workflow]]
-name = "Doc Verification"
-author = "agent"
-
-[workflows.workflow.metadata]
-agentRequireRestartOnSave = false
-
-[[workflows.workflow.tasks]]
-task = "packager.installForAll"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "ls -l README.md && echo '=== README.md ===' && cat README.md"
